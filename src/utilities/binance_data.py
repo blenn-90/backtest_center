@@ -1,8 +1,9 @@
 import pandas as pd
-apikey = '8K4vWPeslbsn84btWqk6Skb8gLvvr9naLoE8cZ05sBUfcWhYoAvoPKjafoDTlvkV'
-secret = 'SrIICejyibgYV44F4pIvN4zdPHvZ9NezmHJf3kh2Rntte3ToZ3j4GaNhR233ZS6C'
 from binance import Client, ThreadedWebsocketManager, ThreadedDepthCacheManager
+import noshare_data
 
+apikey = noshare_data.apikey
+secret = noshare_data.secret
 
 def get_pairs():
     client = Client(apikey, secret)
@@ -11,7 +12,6 @@ def get_pairs():
     for ticker in tickers:
         if 'USDT' in ticker['symbol'] and not ticker['symbol'].startswith('USDT') and 'DOWNUSDT' not in ticker['symbol'] and 'UPUSDT' not in ticker['symbol']:
             usdt_tickers.append(ticker['symbol'])
-    
     return usdt_tickers
 
 def save_pair_data_1d(pair):
@@ -81,4 +81,3 @@ def read_csv_data(path, timeframe, filename):
     return data
 
 #save_all_usdt_pair_1d()
-save_all_usdt_pair_4h()
