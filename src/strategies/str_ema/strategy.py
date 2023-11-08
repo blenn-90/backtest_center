@@ -14,7 +14,6 @@ class ema_strategy(Strategy):
         self.slow_ema_indicator = self.I(i_ema, self.data, ema_period = self.slow_ema_period)
 
     def next(self):
-        print(str(self.fast_ema_period))
         fast_ema = self.fast_ema_indicator[-1]
         slow_ema = self.slow_ema_indicator[-1]
 

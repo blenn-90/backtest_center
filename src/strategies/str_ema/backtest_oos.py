@@ -1,7 +1,8 @@
 #%% importing
+from sources import * 
 import sys
-sys.path.append("c:\\Users\\Alessandro\\Desktop\\python\\backtest_center_v2" + "\\src")
-from strategies.sources import *
+sys.path.append(project_path + "\\src")
+from utilities.noshare_data import *
 from strategies.str_ema.strategy import *
 from utilities.show_result import *
 from utilities.import_data import *

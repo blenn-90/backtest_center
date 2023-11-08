@@ -1,3 +1,4 @@
+#utility class used to import data from tradingview css files
 import pandas as pd
 from binance import Client, ThreadedWebsocketManager, ThreadedDepthCacheManager
 
