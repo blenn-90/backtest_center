@@ -1,11 +1,11 @@
+import sys
 import pandas as pd
-apikey = '8K4vWPeslbsn84btWqk6Skb8gLvvr9naLoE8cZ05sBUfcWhYoAvoPKjafoDTlvkV'
-secret = 'SrIICejyibgYV44F4pIvN4zdPHvZ9NezmHJf3kh2Rntte3ToZ3j4GaNhR233ZS6C'
+import src.utilities.noshare_data as noshare_data
 from binance import Client, ThreadedWebsocketManager, ThreadedDepthCacheManager
 
 
 def get_pairs():
-    client = Client(apikey, secret)
+    client = Client(noshare_data.apikey, noshare_data.secret)
     tickers = client.get_all_tickers()
     usdt_tickers = []
     for ticker in tickers:
@@ -15,10 +15,11 @@ def get_pairs():
     return usdt_tickers
 
 def save_pair_data_1d(pair):
-    client = Client(apikey, secret)
+    client = Client(noshare_data.apikey, noshare_data.secret)
     interval = Client.KLINE_INTERVAL_1DAY
 
     historical = client.get_historical_klines(pair, interval, '1 Jan 2011')
+    print(historical)
     hist_df = pd.DataFrame(historical)
     hist_df.columns = ['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'Close Time', 'Quote Asset Volume', 
                     'Number of Trades', 'TB Base Volume', 'TB Quote Volume', 'Ignore']
@@ -27,11 +28,12 @@ def save_pair_data_1d(pair):
     hist_df = hist_df.drop(columns=['Volume', 'Close Time', 'Quote Asset Volume', 'Number of Trades', 'TB Base Volume', 'TB Quote Volume', 'Ignore'])
     numeric_columns = ['Open', 'High', 'Low', 'Close']
     hist_df[numeric_columns] = hist_df[numeric_columns].apply(pd.to_numeric, axis=1)
-    hist_df.to_csv("c:\\Users\\Alessandro\\Desktop\\python\\backtest_center_v2\\data\\binance_1d\\"+pair+".csv")
+    print(hist_df)
+    hist_df.to_csv(sys.path[1]+ "\\data\\binance_1d\\"+pair+".csv")
     return(hist_df)
 
 def save_pair_data_4h(pair):
-    client = Client(apikey, secret)
+    client = Client(noshare_data.apikey, noshare_data.secret)
     interval = Client.KLINE_INTERVAL_4HOUR
 
     historical = client.get_historical_klines(pair, interval, '1 Jan 2011')
@@ -45,7 +47,7 @@ def save_pair_data_4h(pair):
     numeric_columns = ['Open', 'High', 'Low', 'Close']
     hist_df[numeric_columns] = hist_df[numeric_columns].apply(pd.to_numeric, axis=1)
     print(hist_df)
-    hist_df.to_csv("c:\\Users\\Alessandro\\Desktop\\python\\backtest_center_v2\\data\\binance_4h\\"+pair+".csv")
+    hist_df.to_csv(sys.path[1]+ "\\data\\binance_4h\\"+pair+".csv")
     return(hist_df)
 
 

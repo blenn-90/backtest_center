@@ -1,8 +1,7 @@
 #%% libraries
 from sources import * 
 import sys
-sys.path.append(project_path + "\\src")
-from utilities.import_data import *
+import src.utilities.import_data as import_data
 from backtesting import Backtest, Strategy
 from backtesting.lib import resample_apply
 import pandas_ta as ta
@@ -42,10 +41,10 @@ class ema_strategy(Strategy):
                 self.buy()
 
 #retrive data
-path = "c:\\Users\\Alessandro\\Desktop\\python\\backtest_center_v2\\data"
+path = sys.path[1] + "\\data"
 timeframe = "binance_1d"
 filename = "ETHUSDT.csv"
-data = tradingview_csv_to_dataframe(path, timeframe, filename)
+data = import_data.tradingview_csv_to_dataframe(path, timeframe, filename)
 #print("-->launching backtest")
 bt = Backtest(data[data.index > "2019-01-01"], ema_strategy, cash=cash,  commission=commission)
 stats = bt.optimize(

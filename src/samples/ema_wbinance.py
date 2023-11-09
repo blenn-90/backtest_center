@@ -1,12 +1,10 @@
 #%% libraries
-from sources import * 
 import sys
-sys.path.append(project_path + "\\src")
-from utilities.import_data import *
-from utilities.binance_data import *
+import src.samples.sources as sources
+import src.utilities.binance_data as binance_data
+import pandas_ta as ta
 from backtesting import Backtest, Strategy
 from backtesting.lib import resample_apply
-import pandas_ta as ta
 from os import listdir
 from os.path import isfile, join
 from pathlib import Path  
@@ -40,12 +38,12 @@ class ema_strategy(Strategy):
                 self.buy()
 
 #retrive data
-path = "c:\\Users\\Alessandro\\Desktop\\python\\backtest_center_v2\\data"
+path = sys.path[1] + "\\data"
 timeframe = "binance_4h"
 filename = "ETHUSDT.csv"
-data = read_csv_data(path, timeframe, filename)
+data = binance_data.read_csv_data(path, timeframe, filename)
 #print("-->launching backtest")
-bt = Backtest(data[data.index > "2017-01-01"], ema_strategy, cash=cash,  commission=commission)
+bt = Backtest(data[data.index > "2017-01-01"], ema_strategy, cash=sources.cash,  commission=sources.commission)
 stats = bt.optimize(
         fast_ema_period = range(8, 12, 1),
         slow_ema_period = range(12, 14, 1),
