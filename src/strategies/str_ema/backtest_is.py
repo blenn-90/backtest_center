@@ -34,6 +34,7 @@ for ema_combination in ema_combinations:
             fast_ema_period = ema_combination[0],
             slow_ema_period =  ema_combination[1],
         )
+        print(stats)
         final_equity_per_combination = final_equity_per_combination + stats["Equity Final [$]"]
     print("combination {ema1}, {ema2} -> {equity}".format(ema1 = ema_combination[0], ema2 = ema_combination[1], equity = final_equity_per_combination))
     if final_equity_per_combination > final_equity_best_combination:

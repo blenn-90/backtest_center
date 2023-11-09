@@ -1,7 +1,6 @@
 #%% importing
-from sources import * 
 import sys
-sys.path.append(project_path + "\\src")
+sys.path.append("c:\\Users\\Alessandro\\Desktop\\python\\backtest_center_v2" + "\\src")
 from utilities.noshare_data import *
 from strategies.str_ema.strategy import *
 from utilities.show_result import *
@@ -11,6 +10,7 @@ from backtesting import Backtest, Strategy
 from os import listdir
 from os.path import isfile, join
 from pathlib import Path
+from utilities.binance_data import *
 
 #%% data out-of-sample
 path = project_path + "\\data"
@@ -23,7 +23,7 @@ slow_ema_period = 19
 
 #%% backtest out-of-sample
 for data_file in data_file_set_oos:
-    data = tradingview_csv_to_dataframe(path, timeframe, data_file)
+    data = read_csv_data(path, timeframe, data_file)
     print(data)
     bt = Backtest(data, ema_strategy, cash=cash,  commission=commission)
     stats = bt.optimize(
