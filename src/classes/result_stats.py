@@ -30,7 +30,7 @@ class ResultStat:
         self.avg_trade_percentage = avg_trade_percentage
         self.fast_ema_period = fast_ema_period
         self.slow_ema_period = slow_ema_period
-
+    #function that is used to print the strategy results
     def stamp_result(self):
         return ("{filename}, "
                 "# Trades {trades}, "
@@ -59,7 +59,7 @@ class ResultStat:
                 fast_ema_period=self.fast_ema_period,
                 slow_ema_period=self.slow_ema_period
         ))
-
+#function that is used to create a strategy results object
 def create_result_stat(filename, stats):
     return ResultStat(
             filename, 
@@ -76,7 +76,7 @@ def create_result_stat(filename, stats):
             stats._strategy.fast_ema_period, 
             stats._strategy.slow_ema_period 
         )
-
+#function that is used to get ema mean of a strategy result object
 def get_ema_mean(result_stats):
     counter = 0
     fast_ema_sum = 0
@@ -91,7 +91,7 @@ def get_ema_mean(result_stats):
 
     return [fast_ema_sum/counter, slow_ema_sum/counter]
 
-
+#function that is used to get final equity of a strategy result object
 def get_equity_final(result_stats):
     equity_final_sum = 0
     for result_stat in result_stats:
@@ -99,6 +99,7 @@ def get_equity_final(result_stats):
     
     return equity_final_sum
 
+#function that is used to get all ema combinantion of a strategy result object
 def get_all_ema_combinantion(result_stats):
     all_ema_combinantion = []
     for result_stat in result_stats:

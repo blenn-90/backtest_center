@@ -2,8 +2,9 @@ from backtesting import Strategy
 import src.indicators.i_ema as indicator
 
 class ema_strategy(Strategy):
-    fast_ema_period = 7
-    slow_ema_period = 18
+    #these emas doesnt count, im giving it as parameter to the strategy
+    fast_ema_period = 0
+    slow_ema_period = 0
 
     def init(self):
         self.fast_ema_indicator = self.I(indicator.i_ema, self.data, ema_period = self.fast_ema_period)
