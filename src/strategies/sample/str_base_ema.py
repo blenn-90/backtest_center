@@ -42,9 +42,9 @@ path = sys.path[noshare_data.project_sys_path_position] + "\\data"
 timeframe = "in_sample"
 filename = "AAVEUSDT.csv"
 data = binance_data.read_csv_data(path, timeframe, filename)
-
+print(data)
 #launching backtested
-bt = Backtest(data[data.index > "2017-01-01"], ema_strategy, cash=sources.cash,  commission=sources.commission)
+bt = Backtest(data[data.index > "2021-01-01"], ema_strategy, cash=sources.cash,  commission=sources.commission)
 stats = bt.optimize(
         fast_ema_period = range(8, 12, 1),
         slow_ema_period = range(12, 14, 1),
