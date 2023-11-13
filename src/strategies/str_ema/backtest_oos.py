@@ -37,7 +37,7 @@ for data_file in data_file_set_oos:
     filter_data = data[data.index > "2022-01-01"]
 
     if not filter_data.empty and len(filter_data) > fast_ema_period and len(filter_data) > slow_ema_period:
-        bt = Backtest(data[data.index > "2019-01-01"], strategy.ema_strategy, cash=sources.cash,  commission=sources.commission)
+        bt = Backtest(filter_data, strategy.ema_strategy, cash=sources.cash,  commission=sources.commission)
         stats = bt.run(
             fast_ema_period = fast_ema_period,
             slow_ema_period = slow_ema_period

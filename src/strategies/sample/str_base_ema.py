@@ -1,6 +1,7 @@
 #sample: ema base strategy using import from binance data
 # library imports
 import sys
+print(sys.path)
 import src.strategies.sources as sources
 import src.utilities.get_data.binance_data as binance_data
 import pandas_ta as ta
