@@ -29,8 +29,5 @@ def csv_to_dataframe(path, timeframe, filename, unit):
     #))
     return data
 
-def binance_csv_to_dataframe(path, timeframe, filename):
-    return csv_to_dataframe(path, timeframe, filename, "ms")
-
-def tradingview_csv_to_dataframe(path, timeframe, filename):
+def read_csv_data(path, timeframe, filename):
     return csv_to_dataframe(path, timeframe, filename, "s")

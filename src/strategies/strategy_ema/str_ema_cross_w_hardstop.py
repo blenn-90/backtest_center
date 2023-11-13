@@ -26,6 +26,4 @@ class ema_strategy(Strategy):
              if fast_ema > slow_ema:
                 #buy with hardstop below a certain percetage
                 stoploss = last_close - (last_close * self.hardstop_percentage/100)
-                print("entry: " + str(last_close))
-                print("stoploss: " + str(stoploss))
                 self.buy(size=0.01, sl= stoploss)

@@ -4,6 +4,7 @@ import sys
 import src.strategies.sources as sources
 import src.strategies.strategy_ema.str_ema_cross_w_hardstop as strategy
 import src.utilities.get_data.binance_data as binance_data 
+import src.utilities.get_data.tradingview_data as tradingview_data 
 import src.utilities.noshare_data as noshare_data 
 from src.classes.result_stats import *
 from backtesting import Backtest
@@ -12,13 +13,31 @@ from os.path import isfile, join
 from pathlib import Path
 
 print("----- START IN_SAMPLE BACKTESTING -----")
-# retrive all in-sample files
-timeframe = "binance_1d"
-print("retrive data from {timeframe} folder".format( timeframe = timeframe ))
+# retrive all in-sample binance files
+folder_binance = "in_sample_binance"
+print("retrive data from {folder} folder".format( folder = folder_binance ))
 path = sys.path[noshare_data.project_sys_path_position] + "\\data"
-data_file_set_is = [f for f in listdir(path + "\\" + timeframe) if isfile(join(path + "\\" + timeframe, f))]
+binance_data_file_set_is = [f for f in listdir(path + "\\" + folder_binance) if isfile(join(path + "\\" + folder_binance, f))]
+print("found {number} binance pairs".format( number = binance_data_file_set_is.count ))
 
-print("found {number} pairs".format( number = data_file_set_is.count ))
+# retrive all in-sample tradingview files
+folder_tradingview = "in_sample_tradingview"
+print("retrive data from {folder} folder".format( folder = folder_tradingview ))
+tradingview_data_file_set_is = [f for f in listdir(path + "\\" + folder_tradingview) if isfile(join(path + "\\" + folder_tradingview, f))]
+print("found {number} tradingview pairs".format( number = tradingview_data_file_set_is.count ))
+
+#creating dataset of dataframe
+dataset = {}
+for data_file in binance_data_file_set_is:
+    #importing binance insample files
+    data = binance_data.read_csv_data(path, folder_binance, data_file)
+    dataset[data_file] = data
+
+for data_file in tradingview_data_file_set_is:
+    #importing tradinview insample files
+    data = tradingview_data.read_csv_data(path, folder_tradingview, data_file)
+    dataset[data_file] = data
+
 # defining what data I want to optimize
 # final equity will be decree the best emas in this case
 def opt_func(series):
@@ -37,10 +56,11 @@ for ema_combination in ema_combinations:
     print("start backtesting ema combination: {ema_combination}".format( ema_combination=ema_combination ))
     final_equity_per_combination = 0
     #backtesting all in-sample data and retriving final equity for each iteration 
-    for data_file in data_file_set_is:
-        data = binance_data.read_csv_data(path, timeframe, data_file)
-        print("reading pair: {data_file}".format( data_file=data_file ))
-        #running backtesting
+    #analize binance data
+    for key in dataset:
+        print("reading pair: "+ key)
+        #running backtesting binance
+        data = dataset[key]
         filter_data = data[data.index < "2020-01-01"]
         #check that file contain data and enought row to calculate ema
         if not filter_data.empty and len(filter_data) > ema_combination[0] and len(filter_data) > ema_combination[1]:
@@ -50,6 +70,7 @@ for ema_combination in ema_combinations:
                 slow_ema_period =  ema_combination[1],
             )
             final_equity_per_combination = final_equity_per_combination + stats["Equity Final [$]"]
+            
     print("combination {ema1}, {ema2} -> {equity}".format(ema1 = ema_combination[0], ema2 = ema_combination[1], equity = final_equity_per_combination))
     #checking if the current ema combination have better results then the best ema found
     if final_equity_per_combination > final_equity_best_combination:
