@@ -9,7 +9,7 @@ def get_pairs():
     tickers = client.get_all_tickers()
     usdt_tickers = []
     for ticker in tickers:
-        if 'USDT' in ticker['symbol'] and not ticker['symbol'].startswith('USD') and 'DOWNUSDT' not in ticker['symbol'] and 'UPUSDT' not in ticker['symbol'] and 'BEARUSDT' not in ticker['symbol'] and 'BULLUSDT' not in ticker['symbol']  and not ticker['symbol'].startswith('TUSD') and not ticker['symbol'].startswith('EUR') and not ticker['symbol'].startswith('PAX'):
+        if 'USDT' in ticker['symbol'] and not ticker['symbol'].startswith('BUSD') and not ticker['symbol'].startswith('USD') and 'DOWNUSDT' not in ticker['symbol'] and 'UPUSDT' not in ticker['symbol'] and 'BEARUSDT' not in ticker['symbol'] and 'BULLUSDT' not in ticker['symbol']  and not ticker['symbol'].startswith('TUSD') and not ticker['symbol'].startswith('EUR') and not ticker['symbol'].startswith('PAX'):
             usdt_tickers.append(ticker['symbol'])
 
     return usdt_tickers
@@ -82,5 +82,5 @@ def read_csv_data(path, timeframe, filename):
     #))
     return data
 
-save_all_usdt_pair_1d()
+#save_all_usdt_pair_1d()
 #save_all_usdt_pair_4h()

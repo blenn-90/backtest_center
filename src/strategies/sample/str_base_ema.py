@@ -1,11 +1,11 @@
 #sample: ema base strategy using import from binance data
 # library imports
 import sys
-print(sys.path)
 import src.strategies.sources as sources
 import src.utilities.get_data.binance_data as binance_data
 import src.strategies.strategy_ema.str_ema_cross_w_hardstop as strategy
 import pandas_ta as ta
+import pandas as pd
 import src.indicators.i_ema as indicator
 import src.utilities.noshare_data as noshare_data
 from backtesting import Backtest, Strategy
@@ -17,7 +17,7 @@ from pathlib import Path
 
 #retrive data / use tradinview_data in utilities if data come from tradingview
 path = sys.path[noshare_data.project_sys_path_position] + "\\data"
-timeframe = "in_sample"
+timeframe = "in_sample_binance"
 filename = "AAVEUSDT.csv"
 data = binance_data.read_csv_data(path, timeframe, filename)
 print(data)
@@ -30,4 +30,8 @@ stats = bt.optimize(
         maximize="Equity Final [$]"
     )
 #plot backtest result
+
+with pd.ExcelWriter("trades.xlsx") as writer:
+    stats['_trades'].to_excel(writer)  
+
 bt.plot(resample=False)
