@@ -11,6 +11,7 @@ from backtesting import Backtest
 from os import listdir
 from os.path import isfile, join
 from pathlib import Path
+import pandas as pd
 
 print("----- START IN_SAMPLE BACKTESTING -----")
 # retrive all in-sample binance files
@@ -51,6 +52,9 @@ print("list of ema combinations to be tested: {ema_combinations}".format( ema_co
 
 #variable that trace the best ema equity
 final_equity_best_combination = 0
+#list trades
+df_all_trades = pd.DataFrame()
+
 #iterate all combination and backtesting it
 for ema_combination in ema_combinations:
     print("start backtesting ema combination: {ema_combination}".format( ema_combination=ema_combination ))

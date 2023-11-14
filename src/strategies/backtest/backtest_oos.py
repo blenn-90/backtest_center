@@ -12,6 +12,7 @@ from backtesting import Backtest, Strategy
 from os import listdir
 from os.path import isfile, join
 from pathlib import Path
+from datetime import datetime
 
 print("----- START OUT_OF_SAMPLE BACKTESTING -----")
 # retrive all out_of_sample files
@@ -23,7 +24,7 @@ data_file_set_oos = [f for f in listdir(path + "\\" + timeframe) if isfile(join(
 print("found {number} pairs".format( number = data_file_set_oos.count ))
 
 # defining some basic object used in the backtest
-df_result = pd.DataFrame(columns=["Size", "EntryPrice", "ExitPrice", "PnL", "ReturnPct", "EntryTime", "ExitTime", "Duration"])
+df_result = pd.DataFrame(columns=["Pair","Size", "EntryPrice", "ExitPrice", "PnL", "ReturnPct", "EntryTime", "ExitTime", "Duration"])
 fast_ema_period = 9
 slow_ema_period = 19
 result_stats_oos = []
@@ -47,8 +48,17 @@ for data_file in data_file_set_oos:
     #creating the object to represent the result data
     result_stats = result_stats_printer.create_result_stat(data_file, stats)
     result_stats_oos.append(result_stats)
-    stats._trades['pair'] = data_file
+    stats._trades['Pair'] = Path(data_file).stem
     df_result = pd.concat([df_result, stats._trades])
+
+     
+
+#create excel trades
+now = datetime.now()
+current_time = now.strftime("%H_%M_%S")
+final_df = df_result.sort_values(by=['EntryTime'])
+with pd.ExcelWriter(".\\data\\result\\oos_trades\\oos_trades_"+current_time+".xlsx") as writer:
+    final_df.to_excel(writer)  
 
 # show results passing list of trades
 print(show_result.show_multiassets_results(df_result, len(data_file_set_oos), fast_ema_period = fast_ema_period, slow_ema_period = slow_ema_period))
