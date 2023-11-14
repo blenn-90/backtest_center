@@ -34,7 +34,7 @@ for data_file in data_file_set_oos:
     print("reading pair: {data_file}".format( data_file=data_file ))
     data = binance_data.read_csv_data(path, timeframe, data_file)
     #running backtesting
-    filter_data = data[data.index > "2022-01-01"]
+    filter_data = data[ data.index > "2022-01-01"]
 
     if not filter_data.empty and len(filter_data) > fast_ema_period and len(filter_data) > slow_ema_period:
         bt = Backtest(filter_data, strategy.ema_strategy, cash=sources.cash,  commission=sources.commission)

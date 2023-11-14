@@ -10,6 +10,7 @@ def show_multiassets_results(df_result, number_of_assets, **kwargs):
     avg_trade_sum = 0
     avg_win_trade_sum = 0
     avg_loss_trade_sum = 0
+    win_to_loss_ratio = 0
 
     for index, row in final_df.iterrows():
         avg_trade_sum = avg_trade_sum + row['ReturnPct']
@@ -29,6 +30,8 @@ def show_multiassets_results(df_result, number_of_assets, **kwargs):
         else:
             avg_loss_trade_sum = avg_loss_trade_sum + row['ReturnPct']
 
+    win_to_loss_ratio =  (avg_win_trade_sum / win_counter) / -(avg_loss_trade_sum / (len(final_df.index) - win_counter))
+
     return (
         "--- Results MultiAssets w/ params: fast_ema {fast_ema_period}, slow_ema: {slow_ema_period} --- \n"
             "# Assets: {number_of_assets} \n"
@@ -41,6 +44,7 @@ def show_multiassets_results(df_result, number_of_assets, **kwargs):
             "Avg Win when win [%]: {avg_win_percentage} \n"
             "Avg Loss when loss [%]: {avg_loss_percentage} \n"
             "Avg Trade [%]: {avg_trade_percentage} \n"
+            "Win To Loss Ratio: {win_to_loss_ratio} \n"
         .format(
             number_of_assets = number_of_assets,
             trades = str(len(final_df.index)),
@@ -52,6 +56,7 @@ def show_multiassets_results(df_result, number_of_assets, **kwargs):
             avg_win_percentage = str(round( avg_win_trade_sum / win_counter, 2)),
             avg_loss_percentage = str(round( avg_loss_trade_sum / (len(final_df.index) - win_counter), 2)),
             avg_trade_percentage = str(round( avg_trade_sum / len(final_df.index), 2)),
+            win_to_loss_ratio = str(round( win_to_loss_ratio, 2)),
             fast_ema_period =  kwargs.get("fast_ema_period"),
             slow_ema_period =  kwargs.get("slow_ema_period")
         )
