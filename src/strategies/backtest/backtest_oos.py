@@ -16,7 +16,7 @@ from datetime import datetime
 
 print("----- START OUT_OF_SAMPLE BACKTESTING -----")
 # retrive all out_of_sample files
-timeframe = "binance_1d"
+timeframe = "in_sample_binance"
 print("retrive data from {timeframe} folder".format( timeframe = timeframe ))
 path = sys.path[noshare_data.project_sys_path_position] + "\\data"
 
@@ -51,11 +51,9 @@ for data_file in data_file_set_oos:
     stats._trades['Pair'] = Path(data_file).stem
     df_result = pd.concat([df_result, stats._trades])
 
-     
-
 #create excel trades
 now = datetime.now()
-current_time = now.strftime("%H_%M_%S")
+current_time = now.strftime("%H%M%S")
 final_df = df_result.sort_values(by=['EntryTime'])
 with pd.ExcelWriter(".\\data\\result\\oos_trades\\oos_trades_"+current_time+".xlsx") as writer:
     final_df.to_excel(writer)  

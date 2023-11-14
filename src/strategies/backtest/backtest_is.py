@@ -12,6 +12,7 @@ from os import listdir
 from os.path import isfile, join
 from pathlib import Path
 import pandas as pd
+from datetime import datetime
 
 print("----- START IN_SAMPLE BACKTESTING -----")
 # retrive all in-sample binance files
@@ -59,6 +60,8 @@ df_all_trades = pd.DataFrame()
 for ema_combination in ema_combinations:
     print("start backtesting ema combination: {ema_combination}".format( ema_combination=ema_combination ))
     final_equity_per_combination = 0
+
+    df_result = pd.DataFrame(columns=["Pair","Size", "EntryPrice", "ExitPrice", "PnL", "ReturnPct", "EntryTime", "ExitTime", "Duration"])
     #backtesting all in-sample data and retriving final equity for each iteration 
     #analize binance data
     for key in dataset:
@@ -74,7 +77,15 @@ for ema_combination in ema_combinations:
                 slow_ema_period =  ema_combination[1],
             )
             final_equity_per_combination = final_equity_per_combination + stats["Equity Final [$]"]
-            
+            stats._trades['Pair'] = Path(data_file).stem
+            df_result = pd.concat([df_result, stats._trades])
+
+    now = datetime.now()
+    current_time = now.strftime("%H%M%S")
+    final_df = df_result.sort_values(by=['EntryTime'])
+    with pd.ExcelWriter(".\\data\\result\\is_trades\\is_trades_ema"+str(ema_combination)+"_"+current_time+".xlsx") as writer:
+        final_df.to_excel(writer)  
+        
     print("combination {ema1}, {ema2} -> {equity}".format(ema1 = ema_combination[0], ema2 = ema_combination[1], equity = final_equity_per_combination))
     #checking if the current ema combination have better results then the best ema found
     if final_equity_per_combination > final_equity_best_combination:
