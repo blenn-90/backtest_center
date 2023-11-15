@@ -9,7 +9,7 @@ class PairData:
         self.source = source
         self.data = data
         self.isFirstCycle = isFirstCycle
-
+#create the object
 def create_pair_data(pair, filename, source, data, isFirstCycle):
     return PairData(
             pair, 
@@ -18,6 +18,7 @@ def create_pair_data(pair, filename, source, data, isFirstCycle):
             data,
             isFirstCycle)
 
+#this fuction get a list of pair and give it back it without duplicate, giving priority to tradingview data
 def getListNoDuplicate(list_pair_data):
     final_list_pair_data = {}
     for pair_data in list_pair_data:
@@ -25,6 +26,4 @@ def getListNoDuplicate(list_pair_data):
             if str(pair_data.source) == "binance":
                 continue
         final_list_pair_data[pair_data.pair] = pair_data
-
-    
     return final_list_pair_data
