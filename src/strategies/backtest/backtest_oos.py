@@ -16,7 +16,7 @@ from datetime import datetime
 
 print("----- START OUT_OF_SAMPLE BACKTESTING -----")
 # retrive all out_of_sample files
-timeframe = "in_sample_binance"
+timeframe = "binance_4h"
 print("retrive data from {timeframe} folder".format( timeframe = timeframe ))
 path = sys.path[noshare_data.project_sys_path_position] + "\\data"
 
