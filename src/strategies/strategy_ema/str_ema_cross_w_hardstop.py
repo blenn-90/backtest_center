@@ -1,7 +1,7 @@
 from backtesting import Strategy
 import src.indicators.i_ema as indicator
 
-class ema_strategy(Strategy):
+class ema_cross_w_hardstop_strategy(Strategy):
     #these emas doesnt count, im giving it as parameter to the strategy
     fast_ema_period = 0
     slow_ema_period = 0

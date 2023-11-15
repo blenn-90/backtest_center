@@ -17,12 +17,12 @@ from pathlib import Path
 
 #retrive data / use tradinview_data in utilities if data come from tradingview
 path = sys.path[noshare_data.project_sys_path_position] + "\\data"
-timeframe = "in_sample_binance"
-filename = "AAVEUSDT.csv"
+timeframe = "binance_4h"
+filename = "BTCUSDT.csv"
 data = binance_data.read_csv_data(path, timeframe, filename)
 print(data)
 #launching backtested
-bt = Backtest(data[ (data.index > "2021-01-01") & (data.index < "2022-01-01")], strategy.ema_strategy, cash=sources.cash,  commission=sources.commission)
+bt = Backtest(data[ (data.index > "2021-01-01") & (data.index < "2022-01-01")], strategy.ema_cross_w_hardstop_strategy, cash=sources.cash,  commission=sources.commission)
 stats = bt.optimize(
         fast_ema_period = range(8, 12, 1),
         slow_ema_period = range(12, 14, 1),
@@ -33,5 +33,6 @@ stats = bt.optimize(
 
 with pd.ExcelWriter("trades.xlsx") as writer:
     stats['_trades'].to_excel(writer)  
-
-bt.plot(resample=False)
+print(stats)
+Path("data\\result\\"+str(stats['_strategy'])).mkdir(parents=True, exist_ok=True)
+bt.plot(resample=False, filename = "data\\result\\"+str(stats['_strategy']) + "\\"+str(stats['_strategy']))

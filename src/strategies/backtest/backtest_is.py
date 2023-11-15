@@ -67,6 +67,9 @@ for ema_combination in ema_combinations:
     final_equity_per_combination = 0
 
     df_result = pd.DataFrame(columns=["Pair","Size", "EntryPrice", "ExitPrice", "PnL", "ReturnPct", "EntryTime", "ExitTime", "Duration"])
+    save_data_folder_is = ""
+    
+
     #backtesting all in-sample data and retriving final equity for each iteration 
     #analize binance data
     for key in insample_list:
@@ -82,7 +85,7 @@ for ema_combination in ema_combinations:
         filter_data = data[data.index < "2020-01-01"]
         #check that file contain data and enought row to calculate ema
         if not filter_data.empty and len(filter_data) > ema_combination[0] and len(filter_data) > ema_combination[1]:
-            bt = Backtest(filter_data, strategy.ema_strategy, cash=sources.cash,  commission=sources.commission)
+            bt = Backtest(filter_data, strategy.ema_cross_w_hardstop_strategy, cash=sources.cash,  commission=sources.commission)
             stats = bt.run(
                 fast_ema_period = ema_combination[0],
                 slow_ema_period =  ema_combination[1],
@@ -93,11 +96,17 @@ for ema_combination in ema_combinations:
             stats._trades['Data Source'] = insample_list[key].source
             df_result = pd.concat([df_result, stats._trades])
 
+            save_data_folder_is = "data\\result\\"+str(stats['_strategy'])+"\\in_sample"
+            #if you want to save plots use:
+            #Path(save_data_folder_is +"\\plots\\").mkdir(parents=True, exist_ok=True)
+            #bt.plot(resample=False, open_browser = False, filename = save_data_folder_is + "\\plots\\"+key+"_" + str(stats['_strategy']))
+
     now = datetime.now()
     current_time = now.strftime("%H%M%S")
     final_df = df_result.sort_values(by=['EntryTime'])
-    with pd.ExcelWriter(".\\data\\result\\is_trades\\is_trades_ema"+str(ema_combination)+"_"+current_time+".xlsx") as writer:
-        final_df.to_excel(writer)  
+    Path(save_data_folder_is).mkdir(parents=True, exist_ok=True)
+    with pd.ExcelWriter(save_data_folder_is + "\\trades.xlsx") as writer:
+        final_df.to_excel(writer)
         
     print("combination {ema1}, {ema2} -> {equity}".format(ema1 = ema_combination[0], ema2 = ema_combination[1], equity = final_equity_per_combination))
     #checking if the current ema combination have better results then the best ema found
