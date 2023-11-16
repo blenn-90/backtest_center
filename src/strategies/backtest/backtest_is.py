@@ -51,8 +51,8 @@ def opt_func(series):
     return series["Equity Final [$]"]
 
 # defining ema combination that will be backtested
-fast_ema = [*range(10, 11, 1)]
-slow_ema = [*range(20, 21, 1)]
+fast_ema = [*range(10, 12, 1)]
+slow_ema = [*range(20, 22, 1)]
 ema_combinations = list(itertools.product(fast_ema, slow_ema))
 print("list of ema combinations to be tested: {ema_combinations}".format( ema_combinations=ema_combinations ))
 
@@ -69,7 +69,6 @@ for ema_combination in ema_combinations:
     df_result = pd.DataFrame(columns=["Pair","Size", "EntryPrice", "ExitPrice", "PnL", "ReturnPct", "EntryTime", "ExitTime", "Duration"])
     save_data_folder_is = ""
     
-
     #backtesting all in-sample data and retriving final equity for each iteration 
     #analize binance data
     for key in insample_list:
@@ -82,7 +81,7 @@ for ema_combination in ema_combinations:
 
         #running backtesting binance
         data = insample_list[key].data
-        filter_data = data[ (data.index > "2015-01-01") & (data.index < "2018-30-01")]
+        filter_data = data[ (data.index > "2015-01-01") & (data.index < "2018-01-30")]
         #check that file contain data and enought row to calculate ema
         if not filter_data.empty and len(filter_data) > ema_combination[0] and len(filter_data) > ema_combination[1]:
             bt = Backtest(filter_data, strategy.ema_cross_w_hardstop_strategy, cash=sources.cash,  commission=sources.commission)
