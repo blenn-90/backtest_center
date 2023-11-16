@@ -3,7 +3,7 @@
 import sys
 import pandas as pd
 import src.strategies.sources as sources
-import src.strategies.strategy_ema.str_ema_cross as strategy
+import src.strategies.strategy_ema.str_ema_cross_w_hardstop as strategy
 import src.utilities.show_result as show_result
 import src.classes.result_stats as result_stats_printer
 import src.utilities.get_data.binance_data as binance_data
@@ -25,10 +25,12 @@ print("found {number} pairs".format( number = data_file_set_oos.count ))
 
 # defining some basic object used in the backtest
 df_result = pd.DataFrame(columns=["Pair","Size", "EntryPrice", "ExitPrice", "PnL", "ReturnPct", "EntryTime", "ExitTime", "Duration"])
-fast_ema_period = 9
-slow_ema_period = 19
+fast_ema_period = 10
+slow_ema_period = 20
 result_stats_oos = []
 print("ema combination to be tested: {fast_ema_period}, {fast_ema_period}".format( fast_ema_period=fast_ema_period, slow_ema_period=slow_ema_period ))
+
+save_data_folder_oos = ""
 
 #iterate all files and backtest it
 for data_file in data_file_set_oos:
@@ -38,7 +40,7 @@ for data_file in data_file_set_oos:
     filter_data = data[ data.index > "2022-01-01"]
 
     if not filter_data.empty and len(filter_data) > fast_ema_period and len(filter_data) > slow_ema_period:
-        bt = Backtest(filter_data, strategy.ema_cross_strategy, cash=sources.cash,  commission=sources.commission)
+        bt = Backtest(filter_data, strategy.ema_cross_w_hardstop_strategy, cash=sources.cash,  commission=sources.commission)
         stats = bt.run(
             fast_ema_period = fast_ema_period,
             slow_ema_period = slow_ema_period
@@ -50,12 +52,14 @@ for data_file in data_file_set_oos:
     result_stats_oos.append(result_stats)
     stats._trades['Pair'] = Path(data_file).stem
     df_result = pd.concat([df_result, stats._trades])
+    save_data_folder_oos = "data\\result\\"+str(stats['_strategy'])+"\\out_of_sample"
 
 #create excel trades
+Path(save_data_folder_oos).mkdir(parents=True, exist_ok=True)
 now = datetime.now()
 current_time = now.strftime("%H%M%S")
 final_df = df_result.sort_values(by=['EntryTime'])
-with pd.ExcelWriter(".\\data\\result\\oos_trades\\oos_trades_"+current_time+".xlsx") as writer:
+with pd.ExcelWriter(save_data_folder_oos + "\\trades.xlsx") as writer:
     final_df.to_excel(writer)  
 
 # show results passing list of trades
