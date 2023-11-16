@@ -82,7 +82,7 @@ for ema_combination in ema_combinations:
 
         #running backtesting binance
         data = insample_list[key].data
-        filter_data = data[data.index < "2020-01-01"]
+        filter_data = data[ (data.index > "2015-01-01") & (data.index < "2018-30-01")]
         #check that file contain data and enought row to calculate ema
         if not filter_data.empty and len(filter_data) > ema_combination[0] and len(filter_data) > ema_combination[1]:
             bt = Backtest(filter_data, strategy.ema_cross_w_hardstop_strategy, cash=sources.cash,  commission=sources.commission)
