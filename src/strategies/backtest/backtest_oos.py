@@ -25,8 +25,8 @@ print("found {number} pairs".format( number = data_file_set_oos.count ))
 
 # defining some basic object used in the backtest
 df_result = pd.DataFrame(columns=["Pair","Size", "EntryPrice", "ExitPrice", "PnL", "ReturnPct", "EntryTime", "ExitTime", "Duration"])
-fast_ema_period = 10
-slow_ema_period = 20
+fast_ema_period = 22
+slow_ema_period = 62
 result_stats_oos = []
 print("ema combination to be tested: {fast_ema_period}, {fast_ema_period}".format( fast_ema_period=fast_ema_period, slow_ema_period=slow_ema_period ))
 
