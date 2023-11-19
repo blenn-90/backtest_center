@@ -51,13 +51,16 @@ def opt_func(series):
     return series["Equity Final [$]"]
 
 # defining ema combination that will be backtested
-fast_ema = [*range(20, 40, 2)]
-slow_ema = [*range(50, 100, 2)]
+fast_ema = [*range(20, 24, 2)]
+slow_ema = [*range(60, 64, 2)]
 ema_combinations = list(itertools.product(fast_ema, slow_ema))
 print("list of ema combinations to be tested: {ema_combinations}".format( ema_combinations=ema_combinations ))
 
 #variable that trace the best ema equity
 final_equity_best_combination = 0
+trades_best_combination = pd.DataFrame()
+save_data_folder_is = ""
+
 #list trades
 df_all_trades = pd.DataFrame()
 
@@ -67,8 +70,8 @@ for ema_combination in ema_combinations:
     final_equity_per_combination = 0
 
     df_result = pd.DataFrame(columns=["Pair","Size", "EntryPrice", "ExitPrice", "PnL", "ReturnPct", "EntryTime", "ExitTime", "Duration"])
-    save_data_folder_is = ""
     
+
     #backtesting all in-sample data and retriving final equity for each iteration 
     #analize binance data
     for key in insample_list:
@@ -100,18 +103,20 @@ for ema_combination in ema_combinations:
             #Path(save_data_folder_is +"\\plots\\").mkdir(parents=True, exist_ok=True)
             #bt.plot(resample=False, open_browser = False, filename = save_data_folder_is + "\\plots\\"+key+"_" + str(stats['_strategy']))
 
-    now = datetime.now()
-    current_time = now.strftime("%H%M%S")
-    final_df = df_result.sort_values(by=['EntryTime'])
-    Path(save_data_folder_is).mkdir(parents=True, exist_ok=True)
-    with pd.ExcelWriter(save_data_folder_is + "\\trades.xlsx") as writer:
-        final_df.to_excel(writer)
-        
     print("combination {ema1}, {ema2} -> {equity}".format(ema1 = ema_combination[0], ema2 = ema_combination[1], equity = final_equity_per_combination))
     #checking if the current ema combination have better results then the best ema found
     if final_equity_per_combination > final_equity_best_combination:
         best_combination = ema_combination
         final_equity_best_combination = final_equity_per_combination
+        trades_best_combination = df_result.copy()
+        save_data_folder_is = "data\\result\\"+str(stats['_strategy'])+"\\in_sample"
 
+#best combination data
 print("best combination is: {best_combination} with a final equity = {final_equity_best_combination}".format(
     best_combination = best_combination, final_equity_best_combination = final_equity_best_combination))
+
+#create trades excel for best combination
+final_trades_best_combination = trades_best_combination.sort_values(by=['EntryTime'])
+Path(save_data_folder_is).mkdir(parents=True, exist_ok=True)
+with pd.ExcelWriter(save_data_folder_is + "\\trades.xlsx") as writer:
+    final_trades_best_combination.to_excel(writer)
