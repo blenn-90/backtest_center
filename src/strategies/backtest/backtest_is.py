@@ -13,7 +13,8 @@ from os import listdir
 from os.path import isfile, join
 from pathlib import Path
 import pandas as pd
-from datetime import datetime
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 print("----- START IN_SAMPLE BACKTESTING -----")
 path = sys.path[noshare_data.project_sys_path_position] + "\\data"
@@ -51,8 +52,8 @@ def opt_func(series):
     return series["Equity Final [$]"]
 
 # defining ema combination that will be backtested
-fast_ema = [*range(20, 24, 2)]
-slow_ema = [*range(60, 64, 2)]
+fast_ema = [*range(20, 30, 2)]
+slow_ema = [*range(60, 72, 2)]
 ema_combinations = list(itertools.product(fast_ema, slow_ema))
 print("list of ema combinations to be tested: {ema_combinations}".format( ema_combinations=ema_combinations ))
 
@@ -63,6 +64,9 @@ save_data_folder_is = ""
 
 #list trades
 df_all_trades = pd.DataFrame()
+
+#heatmap
+df_heatmap = pd.DataFrame(columns=["fast_ema", "slow_ema", "equity"])
 
 #iterate all combination and backtesting it
 for ema_combination in ema_combinations:
@@ -97,13 +101,17 @@ for ema_combination in ema_combinations:
             stats._trades['IsFirstCycle'] = insample_list[key].isFirstCycle
             stats._trades['Data Source'] = insample_list[key].source
             df_result = pd.concat([df_result, stats._trades])
-
+            
             save_data_folder_is = "data\\result\\"+str(stats['_strategy'])+"\\in_sample"
             #if you want to save plots use:
             #Path(save_data_folder_is +"\\plots\\").mkdir(parents=True, exist_ok=True)
             #bt.plot(resample=False, open_browser = False, filename = save_data_folder_is + "\\plots\\"+key+"_" + str(stats['_strategy']))
 
     print("combination {ema1}, {ema2} -> {equity}".format(ema1 = ema_combination[0], ema2 = ema_combination[1], equity = final_equity_per_combination))
+    
+    new_row_heatmap = [ema_combination[0], ema_combination[1], final_equity_per_combination]
+    df_heatmap.loc[len(df_heatmap)] = new_row_heatmap
+    
     #checking if the current ema combination have better results then the best ema found
     if final_equity_per_combination > final_equity_best_combination:
         best_combination = ema_combination
@@ -116,7 +124,15 @@ print("best combination is: {best_combination} with a final equity = {final_equi
     best_combination = best_combination, final_equity_best_combination = final_equity_best_combination))
 
 #create trades excel for best combination
+print("saving excel with trades of best combination strategy")
 final_trades_best_combination = trades_best_combination.sort_values(by=['EntryTime'])
 Path(save_data_folder_is).mkdir(parents=True, exist_ok=True)
 with pd.ExcelWriter(save_data_folder_is + "\\trades.xlsx") as writer:
     final_trades_best_combination.to_excel(writer)
+
+#heatmap
+print("creating heatmap")
+df_heatmap.set_index(df_heatmap.iloc[:, 0].name)
+df_m = df_heatmap.groupby(["fast_ema","slow_ema"]).mean().unstack()
+sns.heatmap(df_m)
+plt.show()

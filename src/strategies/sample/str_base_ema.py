@@ -35,7 +35,6 @@ stats, heatmap = bt.optimize(
 hm = heatmap.groupby(["fast_ema_period","slow_ema_period"]).mean().unstack()
 sns.heatmap(hm)
 plt.show()
-print(hm)
 
 with pd.ExcelWriter("trades.xlsx") as writer:
     stats['_trades'].to_excel(writer)  
