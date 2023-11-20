@@ -101,8 +101,6 @@ for ema_combination in ema_combinations:
             stats._trades['IsFirstCycle'] = insample_list[key].isFirstCycle
             stats._trades['Data Source'] = insample_list[key].source
             df_result = pd.concat([df_result, stats._trades])
-            
-            save_data_folder_is = "data\\result\\"+str(stats['_strategy'])+"\\in_sample"
             #if you want to save plots use:
             #Path(save_data_folder_is +"\\plots\\").mkdir(parents=True, exist_ok=True)
             #bt.plot(resample=False, open_browser = False, filename = save_data_folder_is + "\\plots\\"+key+"_" + str(stats['_strategy']))
