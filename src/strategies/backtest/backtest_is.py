@@ -52,13 +52,13 @@ def opt_func(series):
     return series["Equity Final [$]"]
 
 # defining ema combination that will be backtested
-fast_ema = [*range(102, 103, 1)]
-slow_ema = [*range(138, 139, 1)]
+fast_ema = [*range(80,85, 1)]
+slow_ema = [*range(115, 130, 2)]
 ema_combinations = list(itertools.product(fast_ema, slow_ema))
 print("list of ema combinations to be tested: {ema_combinations}".format( ema_combinations=ema_combinations ))
 
 #variable that trace the best ema equity
-final_equity_best_combination = 0
+opt_function_final = 0
 trades_best_combination = pd.DataFrame()
 save_data_folder_is = ""
 
@@ -71,11 +71,10 @@ df_heatmap = pd.DataFrame(columns=["fast_ema", "slow_ema", "equity"])
 #iterate all combination and backtesting it
 for ema_combination in ema_combinations:
     print("start backtesting ema combination: {ema_combination}".format( ema_combination=ema_combination ))
-    final_equity_per_combination = 0
-
+    final_return_per_combination = 0
+    final_exposure_time = 0
     df_result = pd.DataFrame(columns=["Pair","Size", "EntryPrice", "ExitPrice", "PnL", "ReturnPct", "EntryTime", "ExitTime", "Duration"])
-    
-
+   
     #backtesting all in-sample data and retriving final equity for each iteration 
     #analize binance data
     for key in insample_list:
@@ -96,7 +95,8 @@ for ema_combination in ema_combinations:
                 fast_ema_period = ema_combination[0],
                 slow_ema_period =  ema_combination[1],
             )
-            final_equity_per_combination = final_equity_per_combination + stats["Equity Final [$]"]
+            final_return_per_combination = final_return_per_combination + stats["Return [%]"]
+            final_exposure_time =  final_exposure_time + stats["Exposure Time [%]"]
             stats._trades['Pair'] = insample_list[key].pair
             stats._trades['IsFirstCycle'] = insample_list[key].isFirstCycle
             stats._trades['Data Source'] = insample_list[key].source
@@ -105,21 +105,24 @@ for ema_combination in ema_combinations:
             #Path(save_data_folder_is +"\\plots\\").mkdir(parents=True, exist_ok=True)
             #bt.plot(resample=False, open_browser = False, filename = save_data_folder_is + "\\plots\\"+key+"_" + str(stats['_strategy']))
 
-    print("combination {ema1}, {ema2} -> {equity}".format(ema1 = ema_combination[0], ema2 = ema_combination[1], equity = final_equity_per_combination))
-    
-    new_row_heatmap = [ema_combination[0], ema_combination[1], final_equity_per_combination]
+    print("combination {ema1}, {ema2} -> return %: {return_perc}, exposure time: {time}".format(ema1 = ema_combination[0], ema2 = ema_combination[1], return_perc = final_return_per_combination, time = final_exposure_time ))
+    #calculate best combination that have highest return % / exposure time
+    opt_function = final_return_per_combination / final_exposure_time
+
+    #add combination to heatmap
+    new_row_heatmap = [ema_combination[0], ema_combination[1], opt_function]
     df_heatmap.loc[len(df_heatmap)] = new_row_heatmap
     
     #checking if the current ema combination have better results then the best ema found
-    if final_equity_per_combination > final_equity_best_combination:
+    if opt_function > opt_function_final:
         best_combination = ema_combination
-        final_equity_best_combination = final_equity_per_combination
+        opt_function_final = opt_function
         trades_best_combination = df_result.copy()
         save_data_folder_is = "data\\result\\"+str(stats['_strategy'])+"\\in_sample"
 
 #best combination data
-print("best combination is: {best_combination} with a final equity = {final_equity_best_combination}".format(
-    best_combination = best_combination, final_equity_best_combination = final_equity_best_combination))
+print("best combination is: {best_combination} with a return % / exposure time % = {opt_function}".format(
+    best_combination = best_combination, opt_function = opt_function))
 
 #create trades excel for best combination
 print("saving excel with trades of best combination strategy")
