@@ -52,8 +52,8 @@ def opt_func(series):
     return series["Equity Final [$]"]
 
 # defining ema combination that will be backtested
-fast_ema = [*range(20, 30, 2)]
-slow_ema = [*range(60, 72, 2)]
+fast_ema = [*range(102, 103, 1)]
+slow_ema = [*range(138, 139, 1)]
 ema_combinations = list(itertools.product(fast_ema, slow_ema))
 print("list of ema combinations to be tested: {ema_combinations}".format( ema_combinations=ema_combinations ))
 
