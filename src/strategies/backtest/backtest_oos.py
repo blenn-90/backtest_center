@@ -25,34 +25,38 @@ print("found {number} pairs".format( number = data_file_set_oos.count ))
 
 # defining some basic object used in the backtest
 df_result = pd.DataFrame(columns=["Pair","Size", "EntryPrice", "ExitPrice", "PnL", "ReturnPct", "EntryTime", "ExitTime", "Duration"])
-fast_ema_period = 22
-slow_ema_period = 62
-result_stats_oos = []
-print("ema combination to be tested: {fast_ema_period}, {fast_ema_period}".format( fast_ema_period=fast_ema_period, slow_ema_period=slow_ema_period ))
+fast_ema_period = 102
+slow_ema_period = 138
+print("ema combination to be tested: {fast_ema_period}, {slow_ema_period}".format( fast_ema_period=fast_ema_period, slow_ema_period=slow_ema_period ))
 
 save_data_folder_oos = ""
 
 #iterate all files and backtest it
 for data_file in data_file_set_oos:
-    print("reading pair: {data_file}".format( data_file=data_file ))
     data = binance_data.read_csv_data(path, timeframe, data_file)
     #running backtesting
     filter_data = data[ data.index > "2022-01-01"]
-
+    strategy_name = ""
+    #check if filtered data are not empty
     if not filter_data.empty and len(filter_data) > fast_ema_period and len(filter_data) > slow_ema_period:
+        #launching backtest for the filtered data
         bt = Backtest(filter_data, strategy.ema_cross_w_hardstop_strategy, cash=sources.cash,  commission=sources.commission)
         stats = bt.run(
             fast_ema_period = fast_ema_period,
             slow_ema_period = slow_ema_period
         )
-        #bt.plot()
+        #saving results for the current file
+        if stats['# Trades'] > 0 :
+            print("Found {count} trades, backtesting {filename}".format( count = stats['# Trades'], filename = Path(data_file).stem ))
+            stats._trades['Pair'] = Path(data_file).stem
+            df_result = pd.concat([df_result, stats._trades])
+        else:
+            print("Found 0 trades, backtesting "+ Path(data_file).stem)
+      
+        strategy_name = str(stats['_strategy'])
 
     #creating the object to represent the result data
-    result_stats = result_stats_printer.create_result_stat(data_file, stats)
-    result_stats_oos.append(result_stats)
-    stats._trades['Pair'] = Path(data_file).stem
-    df_result = pd.concat([df_result, stats._trades])
-    save_data_folder_oos = "data\\result\\"+str(stats['_strategy'])+"\\out_of_sample"
+    save_data_folder_oos = "data\\result\\"+strategy_name+"\\out_of_sample"
 
 #create excel trades
 Path(save_data_folder_oos).mkdir(parents=True, exist_ok=True)
