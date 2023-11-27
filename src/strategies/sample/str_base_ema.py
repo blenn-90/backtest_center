@@ -3,7 +3,7 @@
 import sys
 import src.strategies.sources as sources
 import src.utilities.get_data.binance_data as binance_data
-import src.strategies.strategy_ema.str_ema_cross_w_hardstop as strategy
+import src.strategies.strategy_ema.str_ema_cross_w_atr as strategy
 import pandas_ta as ta
 import pandas as pd
 import src.indicators.i_ema as indicator
@@ -23,7 +23,7 @@ filename = "BTCUSDT.csv"
 data = binance_data.read_csv_data(path, timeframe, filename)
 print(data)
 #launching backtested
-bt = Backtest(data[ (data.index > "2021-01-01") & (data.index < "2022-01-01")], strategy.ema_cross_w_hardstop_strategy, cash=sources.cash,  commission=sources.commission)
+bt = Backtest(data[ (data.index > "2021-01-01") & (data.index < "2022-01-01")], strategy.ema_cross_w_atr_strategy, cash=sources.cash,  commission=sources.commission)
 stats, heatmap = bt.optimize(
         fast_ema_period = range(20, 32, 2),
         slow_ema_period = range(60, 66, 1),
