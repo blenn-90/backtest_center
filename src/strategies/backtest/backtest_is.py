@@ -2,7 +2,7 @@
 # library imports
 import sys
 import src.strategies.sources as sources
-import src.strategies.strategy_ema.str_ema_cross_w_hardstop as strategy
+import src.strategies.strategy_ema.str_ema_cross_w_atr as strategy
 import src.utilities.get_data.binance_data as binance_data 
 import src.utilities.get_data.tradingview_data as tradingview_data 
 import src.utilities.noshare_data as noshare_data 
@@ -15,6 +15,7 @@ from pathlib import Path
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import numpy as np
 
 print("----- START IN_SAMPLE BACKTESTING -----")
 path = sys.path[noshare_data.project_sys_path_position] + "\\data"
@@ -52,9 +53,12 @@ def opt_func(series):
     return series["Equity Final [$]"]
 
 # defining ema combination that will be backtested
-fast_ema = [*range(80,85, 1)]
-slow_ema = [*range(115, 130, 2)]
-ema_combinations = list(itertools.product(fast_ema, slow_ema))
+fast_ema = [*range(80,82, 1)]
+slow_ema = [*range(115, 120, 2)]
+hardstop_list = np.arange(0.25, 1, 0.25)
+
+ema_combinations = list(itertools.product(fast_ema, slow_ema, hardstop_list))
+print(ema_combinations)
 print("list of ema combinations to be tested: {ema_combinations}".format( ema_combinations=ema_combinations ))
 
 #variable that trace the best ema equity
@@ -89,11 +93,12 @@ for ema_combination in ema_combinations:
         data = insample_list[key].data
         filter_data = data[ (data.index > "2015-01-01") & (data.index < "2018-02-01")]
         #check that file contain data and enought row to calculate ema
-        if not filter_data.empty and len(filter_data) > ema_combination[0] and len(filter_data) > ema_combination[1]:
-            bt = Backtest(filter_data, strategy.ema_cross_w_hardstop_strategy, cash=sources.cash,  commission=sources.commission)
+        if not filter_data.empty and len(filter_data) > ema_combination[0] and len(filter_data) > ema_combination[1] and len(filter_data) > sources.atr_length:
+            bt = Backtest(filter_data, strategy.ema_cross_w_atr_strategy, cash=sources.cash,  commission=sources.commission)
             stats = bt.run(
                 fast_ema_period = ema_combination[0],
                 slow_ema_period =  ema_combination[1],
+                hardstop_opt =  ema_combination[2],
             )
             final_return_per_combination = final_return_per_combination + stats["Return [%]"]
             final_exposure_time =  final_exposure_time + stats["Exposure Time [%]"]
