@@ -74,7 +74,7 @@ df_heatmap = pd.DataFrame(columns=["fast_ema", "slow_ema", "equity"])
 
 #iterate all combination and backtesting it
 for ema_combination in ema_combinations:
-    print("start backtesting ema combination: {ema_combination}".format( ema_combination=ema_combination ))
+    print("start backtesting ema combination: {ema_combination}".format( ema_combination = ema_combination ))
     final_return_per_combination = 0
     final_exposure_time = 0
     df_result = pd.DataFrame(columns=["Pair","Size", "EntryPrice", "ExitPrice", "PnL", "ReturnPct", "EntryTime", "ExitTime", "Duration"])
@@ -110,7 +110,7 @@ for ema_combination in ema_combinations:
             #Path(save_data_folder_is +"\\plots\\").mkdir(parents=True, exist_ok=True)
             #bt.plot(resample=False, open_browser = False, filename = save_data_folder_is + "\\plots\\"+key+"_" + str(stats['_strategy']))
 
-    print("combination {ema1}, {ema2} -> return %: {return_perc}, exposure time: {time}".format(ema1 = ema_combination[0], ema2 = ema_combination[1], return_perc = final_return_per_combination, time = final_exposure_time ))
+    print("combination {combination} -> return %: {return_perc}, exposure time: {time}".format(combination = ema_combination , return_perc = final_return_per_combination, time = final_exposure_time ))
     #calculate best combination that have highest return % / exposure time
     opt_function = final_return_per_combination / final_exposure_time
 
