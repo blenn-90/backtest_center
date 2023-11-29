@@ -19,15 +19,15 @@ import numpy as np
 
 #retrive data / use tradinview_data in utilities if data come from tradingview
 path = sys.path[noshare_data.project_sys_path_position] + "\\data"
-timeframe = "binance_4h"
-filename = "BTCUSDT.csv"
+timeframe = "tradingview_4h"
+filename = "CPCUSDT.csv"
 data = binance_data.read_csv_data(path, timeframe, filename)
 print(data)
 #launching backtested
-bt = Backtest(data[ (data.index > "2021-01-01")], strategy.ema_cross_w_atr_strategy, cash=sources.cash,  commission=sources.commission)
+bt = Backtest(data[ (data.index > "2015-01-01") & (data.index < "2018-02-01") ], strategy.ema_cross_w_atr_strategy, cash=sources.cash,  commission=sources.commission)
 stats, heatmap = bt.optimize(
-        fast_ema_period = range(20, 24, 2),
-        slow_ema_period = range(60, 61, 1),
+        fast_ema_period = range(80, 82, 1),
+        slow_ema_period = range(115, 117, 2),
         hardstop_opt = 1,
         constraint= lambda param: param.slow_ema_period > param.fast_ema_period,
         maximize="Equity Final [$]",

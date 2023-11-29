@@ -53,16 +53,16 @@ def opt_func(series):
     return series["Equity Final [$]"]
 
 # defining ema combination that will be backtested
-fast_ema = [*range(80,82, 1)]
-slow_ema = [*range(115, 120, 2)]
-hardstop_list = np.arange(0.25, 1, 0.25)
+fast_ema = [*range(80, 81, 1)]
+slow_ema = [*range(115, 117, 2)]
+hardstop_list = np.arange(0.5, 1, 0.25)
 
 ema_combinations = list(itertools.product(fast_ema, slow_ema, hardstop_list))
 print(ema_combinations)
 print("list of ema combinations to be tested: {ema_combinations}".format( ema_combinations=ema_combinations ))
 
 #variable that trace the best ema equity
-opt_function_final = 0
+opt_function_final = -99999
 trades_best_combination = pd.DataFrame()
 save_data_folder_is = ""
 
@@ -70,7 +70,9 @@ save_data_folder_is = ""
 df_all_trades = pd.DataFrame()
 
 #heatmap
-df_heatmap = pd.DataFrame(columns=["fast_ema", "slow_ema", "equity"])
+dictionary_heatmap = {}
+for hardstop in hardstop_list:
+        dictionary_heatmap[hardstop] = pd.DataFrame(columns=["fast_ema", "slow_ema", "equity"])
 
 #iterate all combination and backtesting it
 for ema_combination in ema_combinations:
@@ -82,7 +84,6 @@ for ema_combination in ema_combinations:
     #backtesting all in-sample data and retriving final equity for each iteration 
     #analize binance data
     for key in insample_list:
-        print("reading pair "+ key + ", source " + insample_list[key].source)
         #start checking how many cycle this pair did
         oldest_data = data[data.index < "2018-01-01"]
         insample_list[key].isFirstCycle = True
@@ -93,7 +94,7 @@ for ema_combination in ema_combinations:
         data = insample_list[key].data
         filter_data = data[ (data.index > "2015-01-01") & (data.index < "2018-02-01")]
         #check that file contain data and enought row to calculate ema
-        if not filter_data.empty and len(filter_data) > ema_combination[0] and len(filter_data) > ema_combination[1] and len(filter_data) > sources.atr_length:
+        if not filter_data.empty and len(filter_data) > ema_combination[0] and len(filter_data) > ema_combination[1] and len(filter_data) > sources.atr_length and ema_combination[0] != ema_combination[1]:
             bt = Backtest(filter_data, strategy.ema_cross_w_atr_strategy, cash=sources.cash,  commission=sources.commission)
             stats = bt.run(
                 fast_ema_period = ema_combination[0],
@@ -108,15 +109,16 @@ for ema_combination in ema_combinations:
             df_result = pd.concat([df_result, stats._trades])
             #if you want to save plots use:
             #Path(save_data_folder_is +"\\plots\\").mkdir(parents=True, exist_ok=True)
-            #bt.plot(resample=False, open_browser = False, filename = save_data_folder_is + "\\plots\\"+key+"_" + str(stats['_strategy']))
+            #bt.plot(resample=False, open_browser = True, filename = save_data_folder_is + "\\plots\\"+key+"_" + str(stats['_strategy']))
 
     print("combination {combination} -> return %: {return_perc}, exposure time: {time}".format(combination = ema_combination , return_perc = final_return_per_combination, time = final_exposure_time ))
     #calculate best combination that have highest return % / exposure time
     opt_function = final_return_per_combination / final_exposure_time
-
-    #add combination to heatmap
     new_row_heatmap = [ema_combination[0], ema_combination[1], opt_function]
-    df_heatmap.loc[len(df_heatmap)] = new_row_heatmap
+
+    df_heatmap_current_combination = dictionary_heatmap.get(ema_combination[2])
+    df_heatmap_current_combination.loc[len(df_heatmap_current_combination)] = new_row_heatmap
+    dictionary_heatmap.update({ema_combination[2]: df_heatmap_current_combination})
     
     #checking if the current ema combination have better results then the best ema found
     if opt_function > opt_function_final:
@@ -138,7 +140,10 @@ with pd.ExcelWriter(save_data_folder_is + "\\trades.xlsx") as writer:
 
 #heatmap
 print("creating heatmap")
-df_heatmap.set_index(df_heatmap.iloc[:, 0].name)
-df_m = df_heatmap.groupby(["fast_ema","slow_ema"]).mean().unstack()
-sns.heatmap(df_m)
-plt.show()
+for key in dictionary_heatmap:
+    df_heatmap = dictionary_heatmap[key]
+    df_heatmap.set_index(df_heatmap.iloc[:, 0].name)
+    df_m = df_heatmap.groupby(["fast_ema","slow_ema"]).mean().unstack()
+    sns.heatmap(df_m)
+    plt.title(str(key) + '_hardstop', fontsize =20)
+    plt.show()

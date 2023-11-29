@@ -3,7 +3,7 @@
 import sys
 import pandas as pd
 import src.strategies.sources as sources
-import src.strategies.strategy_ema.str_ema_cross_w_hardstop as strategy
+import src.strategies.strategy_ema.str_ema_cross_w_atr as strategy
 import src.utilities.show_result as show_result
 import src.classes.result_stats as result_stats_printer
 import src.utilities.get_data.binance_data as binance_data
@@ -25,8 +25,10 @@ print("found {number} pairs".format( number = data_file_set_oos.count ))
 
 # defining some basic object used in the backtest
 df_result = pd.DataFrame(columns=["Pair","Size", "EntryPrice", "ExitPrice", "PnL", "ReturnPct", "EntryTime", "ExitTime", "Duration"])
+#best combination from IS backtesting
 fast_ema_period = 102
 slow_ema_period = 138
+hardstop_opt = 2
 print("ema combination to be tested: {fast_ema_period}, {slow_ema_period}".format( fast_ema_period=fast_ema_period, slow_ema_period=slow_ema_period ))
 
 save_data_folder_oos = ""
@@ -38,12 +40,13 @@ for data_file in data_file_set_oos:
     filter_data = data[ data.index > "2022-01-01"]
     strategy_name = ""
     #check if filtered data are not empty
-    if not filter_data.empty and len(filter_data) > fast_ema_period and len(filter_data) > slow_ema_period:
+    if not filter_data.empty and len(filter_data) > fast_ema_period and len(filter_data) > slow_ema_period and len(filter_data) > sources.atr_length and slow_ema_period != fast_ema_period:
         #launching backtest for the filtered data
-        bt = Backtest(filter_data, strategy.ema_cross_w_hardstop_strategy, cash=sources.cash,  commission=sources.commission)
+        bt = Backtest(filter_data, strategy.ema_cross_w_atr_strategy, cash=sources.cash,  commission=sources.commission)
         stats = bt.run(
             fast_ema_period = fast_ema_period,
-            slow_ema_period = slow_ema_period
+            slow_ema_period = slow_ema_period,
+            hardstop_opt = hardstop_opt
         )
         #saving results for the current file
         if stats['# Trades'] > 0 :
