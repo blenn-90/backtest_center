@@ -47,18 +47,12 @@ print("creating in-sample dataset - no duplicate and tradingview priority")
 insample_list = pair_data.getListNoDuplicate(list_pair_data)
 #finire di implementare la classe pair data per capire ciclo1 o2 
 
-# defining what data I want to optimize
-# final equity will be decree the best emas in this case
-def opt_func(series):
-    return series["Equity Final [$]"]
-
 # defining ema combination that will be backtested
-fast_ema = [*range(80, 81, 1)]
+fast_ema = [*range(80, 83, 1)]
 slow_ema = [*range(115, 117, 2)]
 hardstop_list = np.arange(0.5, 1, 0.25)
 
 ema_combinations = list(itertools.product(fast_ema, slow_ema, hardstop_list))
-print(ema_combinations)
 print("list of ema combinations to be tested: {ema_combinations}".format( ema_combinations=ema_combinations ))
 
 #variable that trace the best ema equity
@@ -71,8 +65,10 @@ df_all_trades = pd.DataFrame()
 
 #heatmap
 dictionary_heatmap = {}
+dictionary_heatmap_count = 0
 for hardstop in hardstop_list:
         dictionary_heatmap[hardstop] = pd.DataFrame(columns=["fast_ema", "slow_ema", "equity"])
+        dictionary_heatmap_count = dictionary_heatmap_count + 1
 
 #iterate all combination and backtesting it
 for ema_combination in ema_combinations:
@@ -106,7 +102,7 @@ for ema_combination in ema_combinations:
             stats._trades['Pair'] = insample_list[key].pair
             stats._trades['IsFirstCycle'] = insample_list[key].isFirstCycle
             stats._trades['Data Source'] = insample_list[key].source
-            df_result = pd.concat([df_result, stats._trades])
+            df_result = (df_result.copy() if stats._trades.empty else stats._trades.copy() if df_result.empty else pd.concat([df_result, stats._trades])) # if both DataFrames non empty)
             #if you want to save plots use:
             #Path(save_data_folder_is +"\\plots\\").mkdir(parents=True, exist_ok=True)
             #bt.plot(resample=False, open_browser = True, filename = save_data_folder_is + "\\plots\\"+key+"_" + str(stats['_strategy']))
@@ -140,10 +136,25 @@ with pd.ExcelWriter(save_data_folder_is + "\\trades.xlsx") as writer:
 
 #heatmap
 print("creating heatmap")
-for key in dictionary_heatmap:
-    df_heatmap = dictionary_heatmap[key]
-    df_heatmap.set_index(df_heatmap.iloc[:, 0].name)
-    df_m = df_heatmap.groupby(["fast_ema","slow_ema"]).mean().unstack()
-    sns.heatmap(df_m)
-    plt.title(str(key) + '_hardstop', fontsize =20)
-    plt.show()
+#multiplot heatmap
+if dictionary_heatmap_count > 1:
+    fig, axs = plt.subplots(ncols=dictionary_heatmap_count)
+    i=0
+    for key in dictionary_heatmap:
+        df_heatmap = dictionary_heatmap[key]
+        df_heatmap.set_index(df_heatmap.iloc[:, 0].name)
+        df_m = df_heatmap.groupby(["fast_ema","slow_ema"]).mean().unstack()
+        sns.heatmap(df_m, ax=axs[i])
+        i=i+1
+#single plot heatmap
+else:
+    for key in dictionary_heatmap:
+        df_heatmap = dictionary_heatmap[key]
+        df_heatmap.set_index(df_heatmap.iloc[:, 0].name)
+        df_m = df_heatmap.groupby(["fast_ema","slow_ema"]).mean().unstack()
+        sns.heatmap(df_m)
+        plt.title(str(key) + '_hardstop', fontsize =20)
+
+plt.show()
+print("----- END IN_SAMPLE BACKTESTING -----")
+

@@ -71,3 +71,5 @@ with pd.ExcelWriter(save_data_folder_oos + "\\trades.xlsx") as writer:
 
 # show results passing list of trades
 print(show_result.show_multiassets_results(df_result, len(data_file_set_oos), fast_ema_period = fast_ema_period, slow_ema_period = slow_ema_period))
+
+print("----- END OUT_OF_SAMPLE BACKTESTING -----")
