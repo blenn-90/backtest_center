@@ -3,7 +3,7 @@
 import sys
 import src.strategies.sources as sources
 import src.utilities.get_data.binance_data as binance_data
-import src.strategies.strategy_ema.str_ema_cross_w_atr as strategy
+import src.strategies.strategy_ema.str_ema_cross_w_flag as strategy
 import pandas_ta as ta
 import pandas as pd
 import src.indicators.i_ema as indicator
@@ -19,27 +19,21 @@ import numpy as np
 
 #retrive data / use tradinview_data in utilities if data come from tradingview
 path = sys.path[noshare_data.project_sys_path_position] + "\\data"
-timeframe = "tradingview_4h"
-filename = "CPCUSDT.csv"
+timeframe = "binance_4h"
+filename = "BTCUSDT.csv"
 data = binance_data.read_csv_data(path, timeframe, filename)
-print(data)
 #launching backtested
-bt = Backtest(data[ (data.index > "2015-01-01") & (data.index < "2018-02-01") ], strategy.ema_cross_w_atr_strategy, cash=sources.cash,  commission=sources.commission)
+bt = Backtest(data[ (data.index > "2015-01-01") & (data.index < "2022-02-01") ], strategy.ema_cross_strategy, cash=sources.cash,  commission=sources.commission)
 stats, heatmap = bt.optimize(
         fast_ema_period = range(80, 82, 1),
         slow_ema_period = range(115, 117, 2),
-        hardstop_opt = 1,
         constraint= lambda param: param.slow_ema_period > param.fast_ema_period,
         maximize="Equity Final [$]",
         return_heatmap = True
     )
-#plot backtest result
-hm = heatmap.groupby(["fast_ema_period","slow_ema_period"]).mean().unstack()
-sns.heatmap(hm)
-plt.show()
 
-with pd.ExcelWriter("trades.xlsx") as writer:
-    stats['_trades'].to_excel(writer)  
-print(stats)
-Path("data\\result\\"+str(stats['_strategy'])).mkdir(parents=True, exist_ok=True)
-bt.plot(resample=False, filename = "data\\result\\"+str(stats['_strategy']) + "\\"+str(stats['_strategy']))
+# with pd.ExcelWriter("trades.xlsx") as writer:
+#    stats['_trades'].to_excel(writer)  
+#print(stats)
+#Path("data\\result\\"+str(stats['_strategy'])).mkdir(parents=True, exist_ok=True)
+bt.plot(resample=False)
