@@ -28,6 +28,11 @@ class ema_cross_w_atr_strategy(Strategy):
         atr_perc = self.atr[-1] / self.data.Close[-1] * 100
         
         hardstop_final = atr_perc * self.hardstop_opt
+
+        stoploss = last_close - (last_close * hardstop_final / 100)
+        if stoploss < 0:
+            stoploss = 0
+            
         #check if position is already open
         if self.position:
             #close it if ema cross is bearish
@@ -38,8 +43,8 @@ class ema_cross_w_atr_strategy(Strategy):
              if fast_ema > slow_ema and not self.cross_already_bought:
                 self.cross_already_bought = True
                 #buy with hardstop below a certain percetage
-                stoploss = last_close - (last_close * 25 / 100)
-                self.buy(size=0.01, sl= stoploss)
+                
+                self.buy(size=0.01, sl = stoploss)
 
         #every bearish cross i set up that i can open position on the bullish cross
         if fast_ema < slow_ema:

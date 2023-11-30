@@ -50,7 +50,7 @@ insample_list = pair_data.getListNoDuplicate(list_pair_data)
 # defining ema combination that will be backtested
 fast_ema = [*range(80, 83, 1)]
 slow_ema = [*range(115, 117, 2)]
-hardstop_list = np.arange(0.5, 1, 0.25)
+hardstop_list = np.arange(10, 20, 2)
 
 ema_combinations = list(itertools.product(fast_ema, slow_ema, hardstop_list))
 print("list of ema combinations to be tested: {ema_combinations}".format( ema_combinations=ema_combinations ))
@@ -107,10 +107,10 @@ for ema_combination in ema_combinations:
             #Path(save_data_folder_is +"\\plots\\").mkdir(parents=True, exist_ok=True)
             #bt.plot(resample=False, open_browser = True, filename = save_data_folder_is + "\\plots\\"+key+"_" + str(stats['_strategy']))
 
-    print("combination {combination} -> return %: {return_perc}, exposure time: {time}".format(combination = ema_combination , return_perc = final_return_per_combination, time = final_exposure_time ))
-    #calculate best combination that have highest return % / exposure time
+        #calculate best combination that have highest return % / exposure time
     opt_function = final_return_per_combination / final_exposure_time
     new_row_heatmap = [ema_combination[0], ema_combination[1], opt_function]
+    print("combination {combination} -> return %: {return_perc}, exposure time: {time}, result: {result}".format(combination = ema_combination , return_perc = final_return_per_combination, time = final_exposure_time, result = opt_function ))
 
     df_heatmap_current_combination = dictionary_heatmap.get(ema_combination[2])
     df_heatmap_current_combination.loc[len(df_heatmap_current_combination)] = new_row_heatmap
