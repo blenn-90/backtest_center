@@ -49,7 +49,7 @@ insample_list = pair_data.getListNoDuplicate(list_pair_data)
 
 # defining ema combination that will be backtested
 fast_ema = [*range(80, 83, 1)]
-slow_ema = [*range(115, 117, 2)]
+slow_ema = [*range(82, 94, 2)]
 hardstop_list = np.arange(10, 20, 2)
 
 ema_combinations = list(itertools.product(fast_ema, slow_ema, hardstop_list))
@@ -125,7 +125,7 @@ for ema_combination in ema_combinations:
 
 #best combination data
 print("best combination is: {best_combination} with a return % / exposure time % = {opt_function}".format(
-    best_combination = best_combination, opt_function = opt_function))
+    best_combination = best_combination, opt_function = opt_function_final))
 
 #create trades excel for best combination
 print("saving excel with trades of best combination strategy")
