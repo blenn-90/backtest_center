@@ -64,7 +64,7 @@ save_data_folder_is = ""
 df_all_trades = pd.DataFrame()
 
 #excel result export
-df_excel_report = pd.DataFrame(columns=["ema_combination", "equity", "return %", "exposure time %", "return % / exposure time %"])
+df_excel_report = pd.DataFrame(columns=["ema_combination", "equity", "return %", "exposure time %", "return % / exposure time %", "total trades", "win rate %"])
 
 #heatmap
 dictionary_heatmap = {}
@@ -80,6 +80,9 @@ for ema_combination in ema_combinations:
     final_return_per_combination = 0
     final_exposure_time = 0
     final_equity = 0
+    final_total_trades = 0
+    final_total_win = 0
+    
     df_result = pd.DataFrame(columns=["Pair","Size", "EntryPrice", "ExitPrice", "PnL", "ReturnPct", "EntryTime", "ExitTime", "Duration"])
    
     #backtesting all in-sample data and retriving final equity for each iteration 
@@ -105,6 +108,9 @@ for ema_combination in ema_combinations:
             final_return_per_combination = final_return_per_combination + stats["Return [%]"]
             final_exposure_time =  final_exposure_time + stats["Exposure Time [%]"]
             final_equity = final_equity + stats["Exposure Time [%]"]
+            final_total_trades = final_total_trades + stats["# Trades"]
+            final_total_win = final_total_win + (stats["# Trades"] * stats["Win Rate [%]"] / 100)
+
             stats._trades['Pair'] = insample_list[key].pair
             stats._trades['IsFirstCycle'] = insample_list[key].isFirstCycle
             stats._trades['Data Source'] = insample_list[key].source
@@ -133,7 +139,7 @@ for ema_combination in ema_combinations:
             trades_best_combination = df_result.copy()
             save_data_folder_is = "data\\result\\"+str(stats['_strategy'])+"\\in_sample"
             
-        df_excel_report.loc[i_combs] = [ema_combination, final_equity, final_return_per_combination, final_exposure_time, opt_function]
+        df_excel_report.loc[i_combs] = [ema_combination, final_equity, final_return_per_combination, final_exposure_time, opt_function, final_total_trades, final_total_win/final_total_trades*100]
         i_combs = i_combs + 1
 
 #best combination data
