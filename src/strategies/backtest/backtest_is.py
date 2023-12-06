@@ -63,6 +63,9 @@ save_data_folder_is = ""
 #list trades
 df_all_trades = pd.DataFrame()
 
+#excel result export
+df_excel_report = pd.DataFrame(columns=["ema_combination", "equity", "return %", "exposure time %", "return % / exposure time %"])
+
 #heatmap
 dictionary_heatmap = {}
 dictionary_heatmap_count = 0
@@ -71,10 +74,12 @@ for hardstop in hardstop_list:
         dictionary_heatmap_count = dictionary_heatmap_count + 1
 
 #iterate all combination and backtesting it
+i_combs = 0
 for ema_combination in ema_combinations:
     print("start backtesting ema combination: {ema_combination}".format( ema_combination = ema_combination ))
     final_return_per_combination = 0
     final_exposure_time = 0
+    final_equity = 0
     df_result = pd.DataFrame(columns=["Pair","Size", "EntryPrice", "ExitPrice", "PnL", "ReturnPct", "EntryTime", "ExitTime", "Duration"])
    
     #backtesting all in-sample data and retriving final equity for each iteration 
@@ -99,6 +104,7 @@ for ema_combination in ema_combinations:
             )
             final_return_per_combination = final_return_per_combination + stats["Return [%]"]
             final_exposure_time =  final_exposure_time + stats["Exposure Time [%]"]
+            final_equity = final_equity + stats["Exposure Time [%]"]
             stats._trades['Pair'] = insample_list[key].pair
             stats._trades['IsFirstCycle'] = insample_list[key].isFirstCycle
             stats._trades['Data Source'] = insample_list[key].source
@@ -126,6 +132,9 @@ for ema_combination in ema_combinations:
             opt_function_final = opt_function
             trades_best_combination = df_result.copy()
             save_data_folder_is = "data\\result\\"+str(stats['_strategy'])+"\\in_sample"
+            
+        df_excel_report.loc[i_combs] = [ema_combination, final_equity, final_return_per_combination, final_exposure_time, opt_function]
+        i_combs = i_combs + 1
 
 #best combination data
 print("best combination is: {best_combination} with a return % / exposure time % = {opt_function}".format(
@@ -137,6 +146,12 @@ final_trades_best_combination = trades_best_combination.sort_values(by=['EntryTi
 Path(save_data_folder_is).mkdir(parents=True, exist_ok=True)
 with pd.ExcelWriter(save_data_folder_is + "\\trades.xlsx") as writer:
     final_trades_best_combination.to_excel(writer)
+
+#generate excel report 
+print("generate excel report")
+df_excel_report = df_excel_report.sort_values(by=['return % / exposure time %'], ascending=False)
+with pd.ExcelWriter(save_data_folder_is + "\\combination_results.xlsx") as writer:
+    df_excel_report.to_excel(writer)
 
 #heatmap
 print("creating heatmap")
