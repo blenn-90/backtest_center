@@ -2,6 +2,7 @@
 # library imports
 import sys
 import src.strategies.sources as sources
+import src.utilities.sources as ut_sources
 import src.strategies.strategy_ema.str_ema_cross_w_atr as strategy
 import src.utilities.get_data.binance_data as binance_data 
 import src.utilities.get_data.tradingview_data as tradingview_data 
@@ -109,8 +110,8 @@ for ema_combination in ema_combinations:
             final_exposure_time =  final_exposure_time + stats["Exposure Time [%]"]
             final_equity = final_equity + stats["Exposure Time [%]"]
             final_total_trades = final_total_trades + stats["# Trades"]
-            final_total_win = final_total_win + (stats["# Trades"] * stats["Win Rate [%]"] / 100)
-
+            if(stats["# Trades"] != 0):
+                final_total_win = final_total_win + (stats["# Trades"] * stats["Win Rate [%]"] / 100)
             stats._trades['Pair'] = insample_list[key].pair
             stats._trades['IsFirstCycle'] = insample_list[key].isFirstCycle
             stats._trades['Data Source'] = insample_list[key].source
@@ -119,6 +120,7 @@ for ema_combination in ema_combinations:
             #Path(save_data_folder_is +"\\plots\\").mkdir(parents=True, exist_ok=True)
             #bt.plot(resample=False, open_browser = True, filename = save_data_folder_is + "\\plots\\"+key+"_" + str(stats['_strategy']))
 
+    
     #calculate best combination that have highest return % / exposure time
     if final_exposure_time == 0:
         #no trades found
@@ -138,8 +140,8 @@ for ema_combination in ema_combinations:
             opt_function_final = opt_function
             trades_best_combination = df_result.copy()
             save_data_folder_is = "data\\result\\"+str(stats['_strategy'])+"\\in_sample"
-            
-        df_excel_report.loc[i_combs] = [ema_combination, final_equity, final_return_per_combination, final_exposure_time, opt_function, final_total_trades, final_total_win/final_total_trades*100]
+        
+        df_excel_report.loc[i_combs] = [ema_combination, ut_sources.fun_format_decimal(final_equity), ut_sources.fun_format_decimal(final_return_per_combination), ut_sources.fun_format_decimal(final_exposure_time), ut_sources.fun_format_decimal(opt_function), final_total_trades, ut_sources.fun_format_decimal(final_total_win/final_total_trades*100)]
         i_combs = i_combs + 1
 
 #best combination data
