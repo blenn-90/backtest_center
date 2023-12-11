@@ -50,7 +50,7 @@ insample_list = pair_data.getListNoDuplicate(list_pair_data)
 
 # defining ema combination that will be backtested
 fast_ema = [*range(46, 49, 1)]
-slow_ema = [*range(56, 59, 1)]
+slow_ema = [*range(47, 50, 1)]
 hardstop_list = np.arange(18, 20, 2)
 
 ema_combinations = list(itertools.product(fast_ema, slow_ema, hardstop_list))
@@ -99,7 +99,7 @@ for ema_combination in ema_combinations:
         data = insample_list[key].data
         filter_data = data[ (data.index > "2015-01-01") & (data.index < "2018-02-01")]
         #check that file contain data and enought row to calculate ema
-        if not filter_data.empty and len(filter_data) > ema_combination[0] and len(filter_data) > ema_combination[1] and len(filter_data) > sources.atr_length and ema_combination[0] != ema_combination[1]:
+        if not filter_data.empty and len(filter_data) > ema_combination[0] and len(filter_data) > ema_combination[1] and len(filter_data) > sources.atr_length and ema_combination[0] < ema_combination[1]:
             bt = Backtest(filter_data, strategy.ema_cross_w_atr_strategy, cash=sources.cash,  commission=sources.commission)
             stats = bt.run(
                 fast_ema_period = ema_combination[0],
@@ -141,7 +141,7 @@ for ema_combination in ema_combinations:
             trades_best_combination = df_result.copy()
             save_data_folder_is = "data\\result\\"+str(stats['_strategy'])+"\\in_sample"
         
-        df_excel_report.loc[i_combs] = [ema_combination, ut_sources.fun_format_decimal(final_equity), ut_sources.fun_format_decimal(final_return_per_combination), ut_sources.fun_format_decimal(final_exposure_time), ut_sources.fun_format_decimal(opt_function), final_total_trades, ut_sources.fun_format_decimal(final_total_win/final_total_trades*100)]
+        df_excel_report.loc[i_combs] = [ema_combination, ut_sources.fun_format_2decimal(final_equity), ut_sources.fun_format_2decimal(final_return_per_combination), ut_sources.fun_format_2decimal(final_exposure_time), ut_sources.fun_format_4decimal(opt_function), final_total_trades, ut_sources.fun_format_2decimal(final_total_win/final_total_trades*100)]
         i_combs = i_combs + 1
 
 #best combination data
