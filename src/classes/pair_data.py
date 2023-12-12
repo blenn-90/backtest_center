@@ -1,4 +1,5 @@
 import itertools
+import pandas as pd
 
 #use this object to save all the data get from different exchanges
 class PairData:
@@ -26,4 +27,17 @@ def getListNoDuplicate(list_pair_data):
             if str(pair_data.source) == "binance":
                 continue
         final_list_pair_data[pair_data.pair] = pair_data
+    return final_list_pair_data
+
+
+#test
+def getListNoDuplicate2(list_pair_data):
+    final_list_pair_data = {}
+    for pair_data in list_pair_data:
+        if pair_data.pair in list(final_list_pair_data.keys()):
+            pd.concat([pair_data.data, final_list_pair_data[pair_data.pair].data], axis=1)
+
+        final_list_pair_data[pair_data.pair] = pair_data
+
+    print(final_list_pair_data)
     return final_list_pair_data
