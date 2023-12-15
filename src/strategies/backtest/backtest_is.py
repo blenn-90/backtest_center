@@ -26,7 +26,7 @@ print("checking files from {folder} folder".format( folder = folder_tradingview 
 tradingview_data_file_set_is = [f for f in listdir(path + "\\" + folder_tradingview) if isfile(join(path + "\\" + folder_tradingview, f))]
 
 # retrive all in-sample binance files
-folder_binance = "binance_4h"
+folder_binance = "kucoin_4h"
 print("checking files from {folder} folder".format( folder = folder_binance ))
 binance_data_file_set_is = [f for f in listdir(path + "\\" + folder_binance) if isfile(join(path + "\\" + folder_binance, f))]
 

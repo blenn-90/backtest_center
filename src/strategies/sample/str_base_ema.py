@@ -2,7 +2,7 @@
 # library imports
 import sys
 import src.strategies.sources as sources
-import src.utilities.get_data.tradingview_data as tradingview_data
+import src.utilities.get_data.binance_data as binance_data
 import src.strategies.strategy_ema.str_ema_cross_w_flag as strategy
 import pandas_ta as ta
 import pandas as pd
@@ -19,9 +19,10 @@ import numpy as np
 
 #retrive data / use tradinview_data in utilities if data come from tradingview
 path = sys.path[noshare_data.project_sys_path_position] + "\\data"
-timeframe = "tradingview_4h"
-filename = "ADAUSDT.csv"
-data = tradingview_data.read_csv_data(path, timeframe, filename)
+timeframe = "kucoin_4h"
+filename = "BTC-USDT.csv"
+data = binance_data.read_csv_data(path, timeframe, filename)
+print(data)
 #launching backtested
 bt = Backtest(data[ (data.index > "2015-01-01") & (data.index < "2024-02-01") ], strategy.ema_cross_strategy, cash=sources.cash,  commission=sources.commission)
 stats, heatmap = bt.optimize(
