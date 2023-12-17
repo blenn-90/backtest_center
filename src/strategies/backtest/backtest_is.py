@@ -108,7 +108,7 @@ for ema_combination in ema_combinations:
             )
             final_return_per_combination = final_return_per_combination + stats["Return [%]"]
             final_exposure_time =  final_exposure_time + stats["Exposure Time [%]"]
-            final_equity = final_equity + stats["Exposure Time [%]"]
+            final_equity = final_equity + stats["Equity Final [$]"]
             final_total_trades = final_total_trades + stats["# Trades"]
             if(stats["# Trades"] != 0):
                 final_total_win = final_total_win + (stats["# Trades"] * stats["Win Rate [%]"] / 100)

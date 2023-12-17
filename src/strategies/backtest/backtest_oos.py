@@ -16,7 +16,7 @@ from datetime import datetime
 
 print("----- START OUT_OF_SAMPLE BACKTESTING -----")
 # retrive all out_of_sample files
-timeframe = "binance_4h"
+timeframe = "kucoin_4h"
 print("retrive data from {timeframe} folder".format( timeframe = timeframe ))
 path = sys.path[noshare_data.project_sys_path_position] + "\\data"
 
@@ -32,6 +32,11 @@ hardstop_opt = 2
 print("ema combination to be tested: {fast_ema_period}, {slow_ema_period}".format( fast_ema_period=fast_ema_period, slow_ema_period=slow_ema_period ))
 
 save_data_folder_oos = ""
+final_return_per_combination = 0
+final_exposure_time = 0
+final_equity = 0
+final_total_trades = 0
+final_total_win = 0
 
 #iterate all files and backtest it
 for data_file in data_file_set_oos:
@@ -53,6 +58,12 @@ for data_file in data_file_set_oos:
             print("Found {count} trades, backtesting {filename}".format( count = stats['# Trades'], filename = Path(data_file).stem ))
             stats._trades['Pair'] = Path(data_file).stem
             df_result = pd.concat([df_result, stats._trades])
+            final_return_per_combination = final_return_per_combination + stats["Return [%]"]
+            final_exposure_time =  final_exposure_time + stats["Exposure Time [%]"]
+            final_equity = final_equity + stats["Equity Final [$]"]
+            final_total_trades = final_total_trades + stats["# Trades"]
+            if(stats["# Trades"] != 0):
+                final_total_win = final_total_win + (stats["# Trades"] * stats["Win Rate [%]"] / 100)
         else:
             print("Found 0 trades, backtesting "+ Path(data_file).stem)
       
@@ -60,6 +71,13 @@ for data_file in data_file_set_oos:
 
     #creating the object to represent the result data
     save_data_folder_oos = "data\\result\\"+strategy_name+"\\out_of_sample"
+
+        #calculate best combination that have highest return % / exposure time
+    if final_exposure_time == 0:
+        #no trades found
+        print("no trades detected")
+    else:
+        opt_function = final_return_per_combination / final_exposure_time
 
 #create excel trades
 Path(save_data_folder_oos).mkdir(parents=True, exist_ok=True)
@@ -69,7 +87,27 @@ final_df = df_result.sort_values(by=['EntryTime'])
 with pd.ExcelWriter(save_data_folder_oos + "\\trades.xlsx") as writer:
     final_df.to_excel(writer)  
 
+print (
+        "--- Results MultiAssets ---\n"
+            "# Assets: {number_of_assets} \n"
+            "# Trades: {trades} \n"
+            "Equity Final [$] : {equity_final_dollar} \n"
+            "Return [%]: {final_return_per_combination} \n"
+            "Exposure Time [%]: {exposuretime_percentage} \n"
+            "Return [%] / Exposure Time [%]: {opt_function} \n"
+            "Win Rate [%]: {win_rate_percentage} \n"
+        .format(
+            number_of_assets = len(data_file_set_oos),
+            trades = str(len(final_df.index)),
+            equity_final_dollar = str(round(final_equity, 2)),
+            final_return_per_combination =  str(round(final_return_per_combination)),
+            exposuretime_percentage =  str(round(final_exposure_time)),                         
+            opt_function = str(round(opt_function)),    
+            win_rate_percentage = str(round( final_total_win/final_total_trades*100, 2))
+        )
+    )    
+
 # show results passing list of trades
-print(show_result.show_multiassets_results(df_result, len(data_file_set_oos), fast_ema_period = fast_ema_period, slow_ema_period = slow_ema_period))
+#print(show_result.show_multiassets_results(df_result, len(data_file_set_oos), fast_ema_period = fast_ema_period, slow_ema_period = slow_ema_period))
 
 print("----- END OUT_OF_SAMPLE BACKTESTING -----")
