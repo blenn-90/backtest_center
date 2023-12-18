@@ -8,7 +8,7 @@ class ema_cross_w_atr_strategy(Strategy):
     fast_ema_period = 0
     slow_ema_period = 0
     hardstop_opt = 0
-    special_exit_opt = 5
+    special_exit_opt = 0
     atr_length = sources.atr_length
     cross_already_bought = False
 

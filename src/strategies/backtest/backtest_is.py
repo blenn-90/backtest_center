@@ -33,8 +33,9 @@ print("data is loaded")
 fast_ema = [*range(46, 49, 1)]
 slow_ema = [*range(47, 50, 1)]
 hardstop_list = np.arange(18, 20, 2)
+special_exit_opt_list = np.arange(5, 10, 2)
 
-ema_combinations = list(itertools.product(fast_ema, slow_ema, hardstop_list))
+ema_combinations = list(itertools.product(fast_ema, slow_ema, hardstop_list, special_exit_opt_list))
 print("list of ema combinations to be tested: {ema_combinations}".format( ema_combinations=ema_combinations ))
 
 #variable that trace the best ema equity
@@ -87,6 +88,7 @@ for ema_combination in ema_combinations:
                 fast_ema_period = ema_combination[0],
                 slow_ema_period =  ema_combination[1],
                 hardstop_opt =  ema_combination[2],
+                special_exit_opt =  ema_combination[3]
             )
             final_return_per_combination = final_return_per_combination + stats["Return [%]"]
             final_exposure_time =  final_exposure_time + stats["Exposure Time [%]"]

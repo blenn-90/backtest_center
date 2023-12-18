@@ -29,6 +29,7 @@ df_result = pd.DataFrame(columns=["Pair","Size", "EntryPrice", "ExitPrice", "PnL
 fast_ema_period = 102
 slow_ema_period = 138
 hardstop_opt = 2
+special_exit_opt = 5
 print("ema combination to be tested: {fast_ema_period}, {slow_ema_period}".format( fast_ema_period=fast_ema_period, slow_ema_period=slow_ema_period ))
 
 save_data_folder_oos = ""
@@ -51,7 +52,8 @@ for data_file in data_file_set_oos:
         stats = bt.run(
             fast_ema_period = fast_ema_period,
             slow_ema_period = slow_ema_period,
-            hardstop_opt = hardstop_opt
+            hardstop_opt = hardstop_opt,
+            special_exit_opt = special_exit_opt
         )
         #saving results for the current file
         if stats['# Trades'] > 0 :
