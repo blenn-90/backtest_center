@@ -20,34 +20,15 @@ import numpy as np
 
 print("----- START IN_SAMPLE BACKTESTING -----")
 path = sys.path[noshare_data.project_sys_path_position] + "\\data"
-# retrive all in-sample tradingview files
-folder_tradingview = "tradingview_4h"
-print("checking files from {folder} folder".format( folder = folder_tradingview ))
-tradingview_data_file_set_is = [f for f in listdir(path + "\\" + folder_tradingview) if isfile(join(path + "\\" + folder_tradingview, f))]
 
-# retrive all in-sample binance files
-folder_binance = "kucoin_4h"
-print("checking files from {folder} folder".format( folder = folder_binance ))
-binance_data_file_set_is = [f for f in listdir(path + "\\" + folder_binance) if isfile(join(path + "\\" + folder_binance, f))]
+# retrive all in-sample tradingview files
+tradingview_data_file_set_is = tradingview_data.get_file_data_set()
+folder_tradingview = "tradingview_4h"
 
 #creating dataset of dataframe
-list_pair_data = []
-print("retrive data from {folder} folder".format( folder = folder_binance ))
-for data_file in binance_data_file_set_is:
-    #importing binance insample files
-    data = binance_data.read_csv_data(path, folder_binance, data_file)
-    list_pair_data.append(pair_data.create_pair_data(Path(data_file).stem, data_file, "binance", data, False))
-print("retrive data from {folder} folder".format( folder = folder_binance ))
-for data_file in tradingview_data_file_set_is:
-    #importing tradinview insample files
-    data = tradingview_data.read_csv_data(path, folder_tradingview, data_file)
-    list_pair_data.append(pair_data.create_pair_data(Path(data_file).stem, data_file, "tradingview", data, True))
-print("data is loaded")
-#final list of insample data object, tradingview are primary beside binance data
-print("creating in-sample dataset - no duplicate and tradingview priority")
-insample_list = pair_data.getListNoDuplicate(list_pair_data)
-#finire di implementare la classe pair data per capire ciclo1 o2 
+insample_list = tradingview_data.get_insample_list(tradingview_data_file_set_is, path, folder_tradingview)
 
+print("data is loaded")
 # defining ema combination that will be backtested
 fast_ema = [*range(46, 49, 1)]
 slow_ema = [*range(47, 50, 1)]
@@ -89,6 +70,7 @@ for ema_combination in ema_combinations:
     #backtesting all in-sample data and retriving final equity for each iteration 
     #analize binance data
     for key in insample_list:
+        data = insample_list[key].data
         #start checking how many cycle this pair did
         oldest_data = data[data.index < "2018-01-01"]
         insample_list[key].isFirstCycle = True
@@ -96,7 +78,7 @@ for ema_combination in ema_combinations:
             insample_list[key].isFirstCycle = False
 
         #running backtesting binance
-        data = insample_list[key].data
+        
         filter_data = data[ (data.index > "2015-01-01") & (data.index < "2018-02-01")]
         #check that file contain data and enought row to calculate ema
         if not filter_data.empty and len(filter_data) > ema_combination[0] and len(filter_data) > ema_combination[1] and len(filter_data) > sources.atr_length and ema_combination[0] < ema_combination[1]:
