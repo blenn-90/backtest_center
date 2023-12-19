@@ -76,6 +76,14 @@ def save_all_usdt_pair_4h():
     usdt_tickers = get_pairs()
     for usdt_ticker in usdt_tickers:
         save_pair_data_4h(usdt_ticker)
+
+def save_all_usdt_pair_4h_second_part():
+    usdt_tickers = get_pairs()
+    i=0
+    for usdt_ticker in usdt_tickers:
+        i = i+1
+        if i > 390:
+            save_pair_data_4h(usdt_ticker)
         
 
 def read_csv_data(path, timeframe, filename):
@@ -100,4 +108,4 @@ def read_csv_data(path, timeframe, filename):
     return data
 
 #save_all_usdt_pair_1d()
-save_all_usdt_pair_4h()
+save_all_usdt_pair_4h_second_part()
