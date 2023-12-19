@@ -36,7 +36,7 @@ class ema_cross_w_atr_strategy(Strategy):
         #check if position is already open
         if self.position:
             #close it if ema cross is bearish
-            if fast_ema < slow_ema or fast_ema > self.special_exit_opt * last_close:
+            if fast_ema < slow_ema or slow_ema < self.special_exit_opt * last_close:
                 self.position.close()
         else:
              #open position if ema cross is bullish and 
