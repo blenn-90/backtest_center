@@ -46,7 +46,7 @@ def save_pair_data_4h(pair):
     
     final_hist_df = pd.DataFrame(columns=['Date', 'Open', 'Close', 'High', 'Low'])
     final_hist_df.set_index("Date", inplace=True)
-    numeric_columns = ['Open', 'High', 'Low', 'Close']
+    numeric_columns = ['Open', 'Close', 'High', 'Low']
     final_hist_df[numeric_columns] = final_hist_df[numeric_columns].apply(pd.to_numeric, axis=1)
 
     for range_of_6_months in all_years_divided_by_6_months:
@@ -62,7 +62,7 @@ def save_pair_data_4h(pair):
             hist_df['Date']=hist_df['Date'].dt.round('15min')  
             hist_df.set_index("Date", inplace=True)
             hist_df = hist_df.drop(columns=['Amount','Volume'])
-            numeric_columns = ['Open', 'High', 'Low', 'Close']
+            numeric_columns = ['Open', 'Close', 'High', 'Low']
             hist_df[numeric_columns] = hist_df[numeric_columns].apply(pd.to_numeric, axis=1)
             #hist_df['Date'] = hist_df['Date'].dt.strftime('%Y-%m-%d %H:%M:%S')
             final_hist_df = (final_hist_df.copy() if hist_df.empty else hist_df.copy() if final_hist_df.empty else pd.concat([final_hist_df, hist_df])) # if both DataFrames non empty)
@@ -94,7 +94,7 @@ def read_csv_data(path, timeframe, filename):
     data = pd.read_csv(
         path + "\\" + timeframe + "\\" + filename,
         usecols=[0,1,2,3,4],
-        names=["Date","Open","High","Low","Close"],
+        names=["Date",'Open', 'Close', 'High', 'Low'],
         skiprows=[0]
     )
     #print(data)
@@ -108,4 +108,5 @@ def read_csv_data(path, timeframe, filename):
     return data
 
 #save_all_usdt_pair_1d()
-save_all_usdt_pair_4h_second_part()
+#save_all_usdt_pair_4h()
+#save_all_usdt_pair_4h_second_part()

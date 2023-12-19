@@ -2,8 +2,8 @@
 # library imports
 import sys
 import src.strategies.sources as sources
-import src.utilities.get_data.binance_data as binance_data
-import src.strategies.strategy_ema.str_ema_cross_w_flag as strategy
+import src.utilities.get_data.kucoin_data as kucoin_data
+import src.strategies.strategy_ema.str_ema_cross_w_atr as strategy
 import pandas_ta as ta
 import pandas as pd
 import src.indicators.i_ema as indicator
@@ -21,16 +21,15 @@ import numpy as np
 path = sys.path[noshare_data.project_sys_path_position] + "\\data"
 timeframe = "kucoin_4h"
 filename = "BTC-USDT.csv"
-data = binance_data.read_csv_data(path, timeframe, filename)
+data = kucoin_data.read_csv_data(path, timeframe, filename)
 print(data)
 #launching backtested
-bt = Backtest(data[ (data.index > "2015-01-01") & (data.index < "2024-02-01") ], strategy.ema_cross_strategy, cash=sources.cash,  commission=sources.commission)
-stats, heatmap = bt.optimize(
-        fast_ema_period = range(80, 82, 1),
-        slow_ema_period = range(115, 117, 2),
-        constraint= lambda param: param.slow_ema_period > param.fast_ema_period,
-        maximize="Equity Final [$]",
-        return_heatmap = True
+bt = Backtest(data[ (data.index > "2015-01-01") & (data.index < "2024-02-01") ], strategy.ema_cross_w_atr_strategy, cash=sources.cash,  commission=sources.commission)
+stats = bt.run(
+        fast_ema_period = 20,
+        slow_ema_period = 30,
+        hardstop_opt =  20,
+        special_exit_opt = 4
     )
 
 # with pd.ExcelWriter("trades.xlsx") as writer:

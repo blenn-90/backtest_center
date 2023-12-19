@@ -6,7 +6,7 @@ import src.strategies.sources as sources
 import src.strategies.strategy_ema.str_ema_cross_w_atr as strategy
 import src.utilities.show_result as show_result
 import src.classes.result_stats as result_stats_printer
-import src.utilities.get_data.binance_data as binance_data
+import src.utilities.get_data.kucoin_data as kucoin_data
 import src.utilities.noshare_data as noshare_data 
 from backtesting import Backtest, Strategy
 from os import listdir
@@ -41,7 +41,7 @@ final_total_win = 0
 
 #iterate all files and backtest it
 for data_file in data_file_set_oos:
-    data = binance_data.read_csv_data(path, timeframe, data_file)
+    data = kucoin_data.read_csv_data(path, timeframe, data_file)
     #running backtesting
     filter_data = data[ data.index > "2022-01-01"]
     strategy_name = ""
