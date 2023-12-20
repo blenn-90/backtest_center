@@ -15,8 +15,8 @@ class ema_cross_w_atr_strategy(Strategy):
     def init(self):
 
         #calculate fast and slow ema matrix
-        self.fast_ema_indicator = self.I(indicator_ema.i_ema, self.data, ema_period = self.fast_ema_period)
-        self.slow_ema_indicator = self.I(indicator_ema.i_ema, self.data, ema_period = self.slow_ema_period)
+        self.fast_ema_indicator = self.I(indicator_ema.i_ema, self.data, ema_period = self.fast_ema_period, overlay=True, plot=True)
+        self.slow_ema_indicator = self.I(indicator_ema.i_ema, self.data, ema_period = self.slow_ema_period, overlay=True, plot=True)
         self.atr = self.I(indicator_atr.i_atr, self.data, length = self.atr_length)
 
     def next(self):
@@ -32,11 +32,11 @@ class ema_cross_w_atr_strategy(Strategy):
         stoploss = last_close - (last_close * hardstop_final / 100)
         if stoploss < 0:
             stoploss = 0
-            
+        
         #check if position is already open
         if self.position:
             #close it if ema cross is bearish
-            if fast_ema < slow_ema or slow_ema < self.special_exit_opt * last_close:
+            if fast_ema < slow_ema or self.special_exit_opt * slow_ema < last_close:
                 self.position.close()
         else:
              #open position if ema cross is bullish and 

@@ -30,10 +30,10 @@ insample_list = tradingview_data.get_insample_list(tradingview_data_file_set_is,
 
 print("data is loaded")
 # defining ema combination that will be backtested
-fast_ema = [*range(46, 49, 1)]
-slow_ema = [*range(47, 50, 1)]
-hardstop_list = np.arange(18, 20, 2)
-special_exit_opt_list = np.arange(5, 10, 2)
+fast_ema = [*range(54, 108, 6)]
+slow_ema = [*range(180, 300, 6)]
+hardstop_list = np.arange(2, 4.5, 0.5)
+special_exit_opt_list = np.arange(5, 7, 1)
 
 ema_combinations = list(itertools.product(fast_ema, slow_ema, hardstop_list, special_exit_opt_list))
 print("list of ema combinations to be tested: {ema_combinations}".format( ema_combinations=ema_combinations ))
