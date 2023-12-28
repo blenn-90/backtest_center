@@ -129,7 +129,6 @@ for data_file in data_file_set_oos:
                 old_pair_final_total_trades = old_pair_final_total_trades + stats["# Trades"]
                 if(stats["# Trades"] != 0):
                     old_pair_final_total_win = old_pair_final_total_win + (stats["# Trades"] * stats["Win Rate [%]"] / 100)  
-            
         else:
             print("Found 0 trades, backtesting "+ Path(data_file).stem)
       
