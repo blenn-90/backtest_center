@@ -4,6 +4,10 @@ import src.utilities.noshare_data as noshare_data
 from kucoin.client import Client
 import time
 from datetime import datetime
+import src.classes.pair_data as pair_data
+from os import listdir
+from os.path import isfile, join
+from pathlib import Path
 
 def get_pairs():
     client = Client(noshare_data.kc_apikey, noshare_data.kc_secret, noshare_data.kc_passphrase)
@@ -107,8 +111,27 @@ def read_csv_data(path, timeframe, filename):
     #))
     return data
 
+def get_file_data_set():
+    path = sys.path[noshare_data.project_sys_path_position] + "\\data"
+    # retrive all in-sample tradingview files
+    folder_kucoin = "kucoin_4h"
+    print("checking files from {folder} folder".format( folder = folder_kucoin ))
+    kucoin_data_file_set_is = [f for f in listdir(path + "\\" + folder_kucoin) if isfile(join(path + "\\" + folder_kucoin, f))]
+    print ("found " + str(len(kucoin_data_file_set_is)) + " pairs")
+    return kucoin_data_file_set_is
+
+def get_insample_list(kucoin_data_file_set_is, path, folder_tradingview):
+    insample_list = {}
+    for data_file in kucoin_data_file_set_is:
+        #importing tradinview insample files
+        data = read_csv_data(path, folder_tradingview, data_file)
+        pairdata = pair_data.create_pair_data(Path(data_file).stem, data_file, "kucoin", data, True)
+        insample_list[pairdata.pair] = pairdata
+    
+    return insample_list
+
+
 #save_all_usdt_pair_1d()
 #save_all_usdt_pair_4h()
 #save_all_usdt_pair_4h_second_part()
-
-get_pairs()
+#get_pairs()
