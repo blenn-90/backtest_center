@@ -61,3 +61,23 @@ def show_multiassets_results(df_result, number_of_assets, **kwargs):
             slow_ema_period =  kwargs.get("slow_ema_period")
         )
     )
+
+def show_multiassets_results_v2(number_of_assets, trades, equity_final_dollar, final_return_per_combination, exposuretime_percentage, opt_function, win_rate_percentage):
+    return (
+                "# Assets: {number_of_assets} \n"
+                "# Trades: {trades} \n"
+                "Equity Final [$] : {equity_final_dollar} \n"
+                "Return [%]: {final_return_per_combination} \n"
+                "Exposure Time [%]: {exposuretime_percentage} \n"
+                "Return [%] / Exposure Time [%]: {opt_function} \n"
+                "Win Rate [%]: {win_rate_percentage} \n"
+            .format(
+                number_of_assets = number_of_assets,
+                trades = trades,
+                equity_final_dollar = equity_final_dollar,
+                final_return_per_combination =  final_return_per_combination,
+                exposuretime_percentage =  exposuretime_percentage,                         
+                opt_function = opt_function,    
+                win_rate_percentage = win_rate_percentage
+            )
+        )    
