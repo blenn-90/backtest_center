@@ -11,10 +11,10 @@ def get_pairs():
     
     usdt_tickers = []
     for ticker in tickers:
-        if 'USDT' in ticker['symbol'] and not ticker['symbol'].startswith('BUSD') and not ticker['symbol'].startswith('USD') and 'DOWN-USDT' not in ticker['symbol'] and '2DOWN-USDT' not in ticker['symbol'] and 'UP-USDT' not in ticker['symbol'] and '2UP-USDT' not in ticker['symbol'] and '3L-USDT' not in ticker['symbol'] and '3S-USDT' not in ticker['symbol']  and 'DOWN-USDT' not in ticker['symbol'] and 'UPUSDT' not in ticker['symbol'] and 'BEAR-USDT' not in ticker['symbol'] and 'BULL-USDT' not in ticker['symbol']  and not ticker['symbol'].startswith('TUSD') and not ticker['symbol'].startswith('EUR') and not ticker['symbol'].startswith('PAX'):
+        if 'USDT' in ticker['symbol'] and not ticker['symbol'].startswith('BUSD')  and not ticker['symbol'].startswith('ETHW') and not ticker['symbol'].startswith('AUSD') and not ticker['symbol'].startswith('USD') and '2L-USDT' not in ticker['symbol'] and '2S-USDT' not in ticker['symbol']and 'DOWN-USDT' not in ticker['symbol'] and '2DOWN-USDT' not in ticker['symbol'] and 'UP-USDT' not in ticker['symbol'] and '2UP-USDT' not in ticker['symbol'] and '3L-USDT' not in ticker['symbol'] and '3S-USDT' not in ticker['symbol']  and 'DOWN-USDT' not in ticker['symbol'] and 'UPUSDT' not in ticker['symbol'] and 'BEAR-USDT' not in ticker['symbol'] and 'BULL-USDT' not in ticker['symbol']  and not ticker['symbol'].startswith('TUSD') and not ticker['symbol'].startswith('EUR') and not ticker['symbol'].startswith('PAX'):
+            print(ticker['symbol'])
             usdt_tickers.append(ticker['symbol'])
 
-    print(usdt_tickers)
     return usdt_tickers
 
 def save_pair_data_4h(pair):
@@ -110,3 +110,5 @@ def read_csv_data(path, timeframe, filename):
 #save_all_usdt_pair_1d()
 #save_all_usdt_pair_4h()
 #save_all_usdt_pair_4h_second_part()
+
+get_pairs()

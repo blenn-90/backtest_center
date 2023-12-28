@@ -23,11 +23,22 @@ path = sys.path[noshare_data.project_sys_path_position] + "\\data"
 data_file_set_oos = [f for f in listdir(path + "\\" + timeframe) if isfile(join(path + "\\" + timeframe, f))]
 print("found {number} pairs".format( number = data_file_set_oos.count ))
 
+#read cycles data file
+cycle_data_df = pd.read_csv(
+        path + "\\cycles_data\\cycles_data.csv",
+        usecols=[0,1],
+        names=["pair",'born_at_cycle'],
+        skiprows=[0]
+    )
+    #print(data)
+    #setting dataframe index
+print(cycle_data_df)
+
 # defining some basic object used in the backtest
-df_result = pd.DataFrame(columns=["Pair","Size", "EntryPrice", "ExitPrice", "PnL", "ReturnPct", "EntryTime", "ExitTime", "Duration"])
+df_result = pd.DataFrame(columns=["Pair","Size", "EntryPrice", "ExitPrice", "PnL", "ReturnPct", "EntryTime", "ExitTime", "Duration", "Born_at_cycle"])
 #best combination from IS backtesting
-fast_ema_period = 102
-slow_ema_period = 138
+fast_ema_period = 72
+slow_ema_period = 288
 hardstop_opt = 2
 special_exit_opt = 5
 print("ema combination to be tested: {fast_ema_period}, {slow_ema_period}".format( fast_ema_period=fast_ema_period, slow_ema_period=slow_ema_period ))
@@ -43,7 +54,7 @@ final_total_win = 0
 for data_file in data_file_set_oos:
     data = kucoin_data.read_csv_data(path, timeframe, data_file)
     #running backtesting
-    filter_data = data[ data.index > "2022-01-01"]
+    filter_data = data[ data.index > "2020-09-09"]
     strategy_name = ""
     #check if filtered data are not empty
     if not filter_data.empty and len(filter_data) > fast_ema_period and len(filter_data) > slow_ema_period and len(filter_data) > sources.atr_length and slow_ema_period != fast_ema_period:
@@ -58,7 +69,15 @@ for data_file in data_file_set_oos:
         #saving results for the current file
         if stats['# Trades'] > 0 :
             print("Found {count} trades, backtesting {filename}".format( count = stats['# Trades'], filename = Path(data_file).stem ))
-            stats._trades['Pair'] = Path(data_file).stem
+            stats._trades['Pair'] = Path(data_file).stem 
+            
+            #setting cycle data, if no data found set it as new coin
+            if cycle_data_df[cycle_data_df.pair==Path(data_file).stem].empty: 
+                stats._trades['Born_at_cycle'] = 4
+            else:
+                stats._trades['Born_at_cycle'] = cycle_data_df[cycle_data_df.pair==Path(data_file).stem].born_at_cycle.item()
+            
+
             df_result = pd.concat([df_result, stats._trades])
             final_return_per_combination = final_return_per_combination + stats["Return [%]"]
             final_exposure_time =  final_exposure_time + stats["Exposure Time [%]"]
