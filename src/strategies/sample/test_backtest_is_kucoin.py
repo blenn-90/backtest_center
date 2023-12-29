@@ -31,9 +31,9 @@ insample_list = kucoin_data.get_insample_list(kucoin_file_set_is, path, folder_t
 
 print("data is loaded")
 # defining ema combination that will be backtested
-fast_ema = [*range(54, 60, 6)]
-slow_ema = [*range(180, 186, 6)]
-hardstop_list = np.arange(2, 2.5, 0.5)
+fast_ema = [*range(60, 66, 6)]
+slow_ema = [*range(276, 282, 6)]
+hardstop_list = np.arange(2.6, 2.7, 0.5)
 special_exit_opt_list = np.arange(5, 7, 1)
 
 ema_combinations = list(itertools.product(fast_ema, slow_ema, hardstop_list, special_exit_opt_list))
@@ -57,6 +57,17 @@ for hardstop in hardstop_list:
         dictionary_heatmap[hardstop] = pd.DataFrame(columns=["fast_ema", "slow_ema", "equity"])
         dictionary_heatmap_count = dictionary_heatmap_count + 1
 
+#read cycles data file
+cycle_data_df = pd.read_csv(
+        path + "\\cycles_data\\cycles_data.csv",
+        usecols=[0,1],
+        names=["pair",'born_at_cycle'],
+        skiprows=[0]
+    )
+    #print(data)
+    #setting dataframe index
+print(cycle_data_df)
+
 #iterate all combination and backtesting it
 i_combs = 0
 for ema_combination in ema_combinations:
@@ -72,6 +83,10 @@ for ema_combination in ema_combinations:
     #backtesting all in-sample data and retriving final equity for each iteration 
     #analize binance data
     for key in insample_list:
+        #setting cycle data, if no data found set it as new coin
+        if cycle_data_df[cycle_data_df.pair==Path(key).stem].empty or cycle_data_df[cycle_data_df.pair==Path(key).stem].born_at_cycle.item() !=3:
+           continue
+
         data = insample_list[key].data
         #start checking how many cycle this pair did
         oldest_data = data[data.index < "2019-11-01"]
