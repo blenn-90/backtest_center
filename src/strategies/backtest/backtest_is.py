@@ -17,6 +17,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
+import src.indicators.i_atr as indicator_atr
 
 print("----- START IN_SAMPLE BACKTESTING -----")
 path = sys.path[noshare_data.project_sys_path_position] + "\\data"
@@ -30,9 +31,9 @@ insample_list = tradingview_data.get_insample_list(tradingview_data_file_set_is,
 
 print("data is loaded")
 # defining ema combination that will be backtested
-fast_ema = [*range(54, 108, 6)]
-slow_ema = [*range(180, 300, 6)]
-hardstop_list = np.arange(2, 4.5, 0.5)
+fast_ema = [*range(60, 66, 6)]
+slow_ema = [*range(180,186, 6)]
+hardstop_list = np.arange(2, 2.5, 0.5)
 special_exit_opt_list = np.arange(5, 7, 1)
 
 ema_combinations = list(itertools.product(fast_ema, slow_ema, hardstop_list, special_exit_opt_list))
@@ -66,7 +67,7 @@ for ema_combination in ema_combinations:
     final_total_trades = 0
     final_total_win = 0
     
-    df_result = pd.DataFrame(columns=["Pair","Size", "EntryPrice", "ExitPrice", "PnL", "ReturnPct", "EntryTime", "ExitTime", "Duration"])
+    df_result = pd.DataFrame(columns=["Pair","Size", "EntryPrice", "ExitPrice", "PnL", "ReturnPct", "EntryTime", "ExitTime", "Duration", "ATR"])
    
     #backtesting all in-sample data and retriving final equity for each iteration 
     #analize binance data
@@ -90,6 +91,7 @@ for ema_combination in ema_combinations:
                 hardstop_opt =  ema_combination[2],
                 special_exit_opt =  ema_combination[3]
             )
+            
             final_return_per_combination = final_return_per_combination + stats["Return [%]"]
             final_exposure_time =  final_exposure_time + stats["Exposure Time [%]"]
             final_equity = final_equity + stats["Equity Final [$]"]
@@ -99,7 +101,9 @@ for ema_combination in ema_combinations:
             stats._trades['Pair'] = insample_list[key].pair
             stats._trades['IsFirstCycle'] = insample_list[key].isFirstCycle
             stats._trades['Data Source'] = insample_list[key].source
-            df_result = (df_result.copy() if stats._trades.empty else stats._trades.copy() if df_result.empty else pd.concat([df_result, stats._trades])) # if both DataFrames non empty)
+            atr_df = indicator_atr.i_atr_v2(filter_data, sources.atr_length)
+            trades_df = stats['_trades'].merge(atr_df, how='left', on='EntryTime')
+            df_result = (df_result.copy() if stats._trades.empty else stats._trades.copy() if df_result.empty else pd.concat([df_result, trades_df])) # if both DataFrames non empty)
             #if you want to save plots use:
             #Path(save_data_folder_is +"\\plots\\").mkdir(parents=True, exist_ok=True)
             #bt.plot(resample=False, open_browser = True, filename = save_data_folder_is + "\\plots\\"+key+"_" + str(stats['_strategy']))

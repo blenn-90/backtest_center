@@ -17,6 +17,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
+import src.indicators.i_atr as indicator_atr
 
 print("----- START IN_SAMPLE BACKTESTING -----")
 path = sys.path[noshare_data.project_sys_path_position] + "\\data"
@@ -78,7 +79,7 @@ for ema_combination in ema_combinations:
     final_total_trades = 0
     final_total_win = 0
     
-    df_result = pd.DataFrame(columns=["Pair","Size", "EntryPrice", "ExitPrice", "PnL", "ReturnPct", "EntryTime", "ExitTime", "Duration"])
+    df_result = pd.DataFrame(columns=["Pair","Size", "EntryPrice", "ExitPrice", "PnL", "ReturnPct", "EntryTime", "ExitTime", "Duration", "ATR"])
    
     #backtesting all in-sample data and retriving final equity for each iteration 
     #analize binance data
@@ -115,7 +116,9 @@ for ema_combination in ema_combinations:
             stats._trades['Pair'] = insample_list[key].pair
             stats._trades['IsFirstCycle'] = insample_list[key].isFirstCycle
             stats._trades['Data Source'] = insample_list[key].source
-            df_result = (df_result.copy() if stats._trades.empty else stats._trades.copy() if df_result.empty else pd.concat([df_result, stats._trades])) # if both DataFrames non empty)
+            atr_df = indicator_atr.i_atr_v2(filter_data, sources.atr_length)
+            trades_df = stats['_trades'].merge(atr_df, how='left', on='EntryTime')
+            df_result = (df_result.copy() if stats._trades.empty else stats._trades.copy() if df_result.empty else pd.concat([df_result, trades_df])) # if both DataFrames non empty)
             #if you want to save plots use:
             #Path(save_data_folder_is +"\\plots\\").mkdir(parents=True, exist_ok=True)
             #bt.plot(resample=False, open_browser = True, filename = save_data_folder_is + "\\plots\\"+key+"_" + str(stats['_strategy']))

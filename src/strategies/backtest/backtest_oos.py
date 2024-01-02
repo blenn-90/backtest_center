@@ -13,7 +13,8 @@ from os import listdir
 from os.path import isfile, join
 from pathlib import Path
 from datetime import datetime
-import src.utilities.show_result as show_result 
+import src.utilities.show_result as show_result
+import src.indicators.i_atr as indicator_atr
 
 print("----- START OUT_OF_SAMPLE BACKTESTING -----")
 # retrive all out_of_sample files
@@ -101,7 +102,11 @@ for data_file in data_file_set_oos:
                 stats._trades['Born_at_cycle'] = cycle_data_df[cycle_data_df.pair==Path(data_file).stem].born_at_cycle.item()
                 current_cycle_born = cycle_data_df[cycle_data_df.pair==Path(data_file).stem].born_at_cycle.item()
             print("{filename} is born at cycle {cycle}".format( cycle = current_cycle_born, filename = Path(data_file).stem ))
-            df_result = pd.concat([df_result, stats._trades])
+
+            atr_df = indicator_atr.i_atr_v2(filter_data, sources.atr_length)
+            trades_df = stats['_trades'].merge(atr_df, how='left', on='EntryTime')
+
+            df_result = pd.concat([df_result, trades_df])
             #final data to be printed
             final_return_per_combination = final_return_per_combination + stats["Return [%]"]
             final_exposure_time =  final_exposure_time + stats["Exposure Time [%]"]
@@ -112,7 +117,7 @@ for data_file in data_file_set_oos:
             #new pair data
             if current_cycle_born == 3:
                 counter_new_pair = counter_new_pair + 1
-                df_result_new_pair = pd.concat([df_result_new_pair, stats._trades])
+                df_result_new_pair = pd.concat([df_result_new_pair, trades_df])
                 new_pair_final_return_per_combination = new_pair_final_return_per_combination + stats["Return [%]"]
                 new_pair_final_exposure_time =  new_pair_final_exposure_time + stats["Exposure Time [%]"]
                 new_pair_final_equity = new_pair_final_equity + stats["Equity Final [$]"]
@@ -122,7 +127,7 @@ for data_file in data_file_set_oos:
             #old pair data
             if current_cycle_born == 2 or current_cycle_born == 1:
                 counter_old_pair = counter_old_pair + 1
-                df_result_old_pair = pd.concat([df_result_old_pair, stats._trades])
+                df_result_old_pair = pd.concat([df_result_old_pair, trades_df])
                 old_pair_final_return_per_combination = old_pair_final_return_per_combination + stats["Return [%]"]
                 old_pair_final_exposure_time =  old_pair_final_exposure_time + stats["Exposure Time [%]"]
                 old_pair_final_equity = old_pair_final_equity + stats["Equity Final [$]"]
