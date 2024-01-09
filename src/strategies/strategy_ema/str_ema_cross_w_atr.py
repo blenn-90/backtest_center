@@ -10,7 +10,7 @@ class ema_cross_w_atr_strategy(Strategy):
     hardstop_opt = 0
     special_exit_opt = 0
     atr_length = sources.atr_length
-    cross_already_bought = False
+    cross_already_bought = True
 
     def init(self):
 

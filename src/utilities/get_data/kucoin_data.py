@@ -94,22 +94,27 @@ def read_csv_data(path, timeframe, filename):
     #print("--> called csv_to_dataframe - path {}, timeframe {}, filename {}".format(
     #    path, timeframe, filename
     #))
-    #reading csv file
-    data = pd.read_csv(
-        path + "\\" + timeframe + "\\" + filename,
-        usecols=[0,1,2,3,4],
-        names=["Date",'Open', 'Close', 'High', 'Low'],
-        skiprows=[0]
-    )
-    #print(data)
-    #setting dataframe index
-    data["Date"] = pd.to_datetime(data["Date"])
-    data.set_index("Date", inplace=True)
-
-    #print("--> ending csv_to_dataframe - path {}, timeframe {}, filename {}".format(
-    #    path, timeframe, filename
-    #))
-    return data
+    final_path = path + "\\" + timeframe + "\\" + filename
+    my_file = Path(final_path)
+    if my_file.is_file():
+ 
+        #reading csv file
+        data = pd.read_csv(
+            final_path,
+            usecols=[0,1,2,3,4],
+            names=["Date",'Open', 'Close', 'High', 'Low'],
+            skiprows=[0]
+        )
+        #print(data)
+        #setting dataframe index
+        data["Date"] = pd.to_datetime(data["Date"])
+        data.set_index("Date", inplace=True)
+        #print("--> ending csv_to_dataframe - path {}, timeframe {}, filename {}".format(
+        #    path, timeframe, filename
+        #))
+        return data
+    
+    return pd.DataFrame()
 
 def get_file_data_set():
     path = sys.path[noshare_data.project_sys_path_position] + "\\data"

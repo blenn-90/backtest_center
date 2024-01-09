@@ -77,7 +77,7 @@ old_pair_final_total_win = 0
 for data_file in data_file_set_oos:
     data = kucoin_data.read_csv_data(path, timeframe, data_file)
     #running backtesting
-    filter_data = data[ (data.index > "2019-11-01") & (data.index < "2022-02-01")]
+    filter_data = data[ (data.index > "2022-11-01") & (data.index < "2024-02-01")]
     strategy_name = ""
     #check if filtered data are not empty
     if not filter_data.empty and len(filter_data) > fast_ema_period and len(filter_data) > slow_ema_period and len(filter_data) > sources.atr_length and slow_ema_period != fast_ema_period:
