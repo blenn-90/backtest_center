@@ -31,8 +31,8 @@ insample_list = tradingview_data.get_insample_list(tradingview_data_file_set_is,
 
 print("data is loaded")
 # defining ema combination that will be backtested
-fast_ema = [*range(60, 66, 6)]
-slow_ema = [*range(180,186, 6)]
+fast_ema = [*range(60, 72, 6)]
+slow_ema = [*range(180,192, 6)]
 hardstop_list = np.arange(2, 2.5, 0.5)
 special_exit_opt_list = np.arange(5, 7, 1)
 
@@ -48,7 +48,7 @@ save_data_folder_is = ""
 df_all_trades = pd.DataFrame()
 
 #excel result export
-df_excel_report = pd.DataFrame(columns=["ema_combination", "equity", "return %", "exposure time %", "return % / exposure time %", "total trades", "win rate %"])
+df_excel_report = pd.DataFrame(columns=["ema_combination", "equity", "return %", "exposure time %", "total trades", "win rate %"])
 
 #heatmap
 dictionary_heatmap = {}
@@ -114,9 +114,9 @@ for ema_combination in ema_combinations:
         #no trades found
         print("no trades detected")
     else:
-        opt_function = final_return_per_combination / final_exposure_time
+        opt_function = final_return_per_combination
         new_row_heatmap = [ema_combination[0], ema_combination[1], opt_function]
-        print("combination {combination} -> return %: {return_perc}, exposure time: {time}, result: {result}".format(combination = ema_combination , return_perc = final_return_per_combination, time = final_exposure_time, result = opt_function ))
+        print("combination {combination} -> return %: {return_perc}".format(combination = ema_combination , return_perc = final_return_per_combination ))
 
         df_heatmap_current_combination = dictionary_heatmap.get(ema_combination[2])
         df_heatmap_current_combination.loc[len(df_heatmap_current_combination)] = new_row_heatmap
@@ -129,11 +129,11 @@ for ema_combination in ema_combinations:
             trades_best_combination = df_result.copy()
             save_data_folder_is = "data\\result\\"+str(stats['_strategy'])+"\\in_sample"
         
-        df_excel_report.loc[i_combs] = [ema_combination, ut_sources.fun_format_2decimal(final_equity), ut_sources.fun_format_2decimal(final_return_per_combination), ut_sources.fun_format_2decimal(final_exposure_time), ut_sources.fun_format_4decimal(opt_function), final_total_trades, ut_sources.fun_format_2decimal(final_total_win/final_total_trades*100)]
+        df_excel_report.loc[i_combs] = [ema_combination, ut_sources.fun_format_2decimal(final_equity), ut_sources.fun_format_2decimal(final_return_per_combination), ut_sources.fun_format_2decimal(final_exposure_time), final_total_trades, ut_sources.fun_format_2decimal(final_total_win/final_total_trades*100)]
         i_combs = i_combs + 1
 
 #best combination data
-print("best combination is: {best_combination} with a return % / exposure time % = {opt_function}".format(
+print("best combination is: {best_combination} with a return % = {opt_function}".format(
     best_combination = best_combination, opt_function = opt_function_final))
 
 #create trades excel for best combination
@@ -145,7 +145,7 @@ with pd.ExcelWriter(save_data_folder_is + "\\trades.xlsx") as writer:
 
 #generate excel report 
 print("generate excel report")
-df_excel_report = df_excel_report.sort_values(by=['return % / exposure time %'], ascending=False)
+df_excel_report = df_excel_report.sort_values(by=['return %'], ascending=False)
 with pd.ExcelWriter(save_data_folder_is + "\\combination_results.xlsx") as writer:
     df_excel_report.to_excel(writer)
 

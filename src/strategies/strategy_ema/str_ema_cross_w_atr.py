@@ -2,6 +2,8 @@ from backtesting import Strategy
 import src.indicators.i_ema as indicator_ema
 import src.indicators.i_atr as indicator_atr
 import src.strategies.sources as sources
+from random import randint
+
 
 class ema_cross_w_atr_strategy(Strategy):
     #these emas doesnt count, im giving it as parameter to the strategy
@@ -20,9 +22,10 @@ class ema_cross_w_atr_strategy(Strategy):
         self.atr = self.I(indicator_atr.i_atr, self.data, length = self.atr_length)
 
     def next(self):
+        random_latency =  randint(1, 3)
         #get last fast and slow ema from indicator
-        fast_ema = self.fast_ema_indicator[-1]
-        slow_ema = self.slow_ema_indicator[-1]
+        fast_ema = self.fast_ema_indicator[-random_latency]
+        slow_ema = self.slow_ema_indicator[-random_latency]
         #get last close value
         last_close = self.data.Close[-1]
         #atr percentuale
