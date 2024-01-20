@@ -22,10 +22,10 @@ class ema_cross_w_atr_strategy(Strategy):
         self.atr = self.I(indicator_atr.i_atr, self.data, length = self.atr_length)
 
     def next(self):
-        random_latency =  -2
+        random_latency =  -1
         #get last fast and slow ema from indicator
-        fast_ema = self.fast_ema_indicator[-random_latency]
-        slow_ema = self.slow_ema_indicator[-random_latency]
+        fast_ema = self.fast_ema_indicator[random_latency]
+        slow_ema = self.slow_ema_indicator[random_latency]
         #get last close value
         last_close = self.data.Close[-1]
         #atr percentuale

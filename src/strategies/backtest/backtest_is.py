@@ -91,7 +91,6 @@ for ema_combination in ema_combinations:
                 hardstop_opt =  ema_combination[2],
                 special_exit_opt =  ema_combination[3]
             )
-            
             final_return_per_combination = final_return_per_combination + stats["Return [%]"]
             final_exposure_time =  final_exposure_time + stats["Exposure Time [%]"]
             final_equity = final_equity + stats["Equity Final [$]"]
