@@ -22,7 +22,7 @@ class ema_cross_w_atr_strategy(Strategy):
         self.atr = self.I(indicator_atr.i_atr, self.data, length = self.atr_length)
 
     def next(self):
-        random_latency =  randint(1, 3)
+        random_latency =  -2
         #get last fast and slow ema from indicator
         fast_ema = self.fast_ema_indicator[-random_latency]
         slow_ema = self.slow_ema_indicator[-random_latency]
