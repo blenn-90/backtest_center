@@ -5,7 +5,7 @@ import src.strategies.sources as sources
 import src.utilities.sources as ut_sources
 import src.strategies.strategy_ema.str_ema_cross_w_atr as strategy
 import src.utilities.get_data.binance_data as binance_data 
-import src.utilities.get_data.tradingview_data as tradingview_data 
+import src.utilities.get_data.kucoin_data as kucoin_data 
 import src.utilities.noshare_data as noshare_data 
 import src.classes.pair_data as pair_data
 from src.classes.result_stats import *
@@ -23,11 +23,11 @@ print("----- START IN_SAMPLE BACKTESTING -----")
 path = sys.path[noshare_data.project_sys_path_position] + "\\data"
 
 # retrive all in-sample tradingview files
-tradingview_data_file_set_is = tradingview_data.get_file_data_set()
-folder_tradingview = "tradingview_4h"
+tradingview_data_file_set_is = kucoin_data.get_file_data_set()
+folder_tradingview = "kucoin_4h"
 
 #creating dataset of dataframe
-insample_list = tradingview_data.get_insample_list(tradingview_data_file_set_is, path, folder_tradingview)
+insample_list = kucoin_data.get_insample_list(tradingview_data_file_set_is, path, folder_tradingview)
 
 print("data is loaded")
 # defining ema combination that will be backtested
@@ -81,7 +81,7 @@ for ema_combination in ema_combinations:
 
         #running backtesting binance
         
-        filter_data = data[ (data.index > "2015-01-01") & (data.index < "2018-02-01")]
+        filter_data = data[ (data.index > "2018-01-01") & (data.index < "2022-02-01")]
         #check that file contain data and enought row to calculate ema
         if not filter_data.empty and len(filter_data) > ema_combination[0] and len(filter_data) > ema_combination[1] and len(filter_data) > sources.atr_length and ema_combination[0] < ema_combination[1]:
             bt = Backtest(filter_data, strategy.ema_cross_w_atr_strategy, cash=sources.cash,  commission=sources.commission)
