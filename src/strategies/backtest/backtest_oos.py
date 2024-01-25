@@ -43,10 +43,10 @@ df_result_old_pair = pd.DataFrame(columns=["Pair","Size", "EntryPrice", "ExitPri
 
 
 #best combination from IS backtesting
-fast_ema_period = 84
-slow_ema_period = 276
-hardstop_opt = 2.4
-special_exit_opt = 8.4
+fast_ema_period = 72
+slow_ema_period = 254
+hardstop_opt = 99
+special_exit_opt = 5
 print("ema combination to be tested: {fast_ema_period}, {slow_ema_period}".format( fast_ema_period=fast_ema_period, slow_ema_period=slow_ema_period ))
 
 save_data_folder_oos = ""
@@ -77,7 +77,7 @@ old_pair_final_total_win = 0
 for data_file in data_file_set_oos:
     data = kucoin_data.read_csv_data(path, timeframe, data_file)
     #running backtesting
-    filter_data = data[ (data.index > "2022-11-01") & (data.index < "2024-02-01")]
+    filter_data = data[ (data.index > "2020-01-01") & (data.index < "2022-06-01")]
     strategy_name = ""
     #check if filtered data are not empty
     if not filter_data.empty and len(filter_data) > fast_ema_period and len(filter_data) > slow_ema_period and len(filter_data) > sources.atr_length and slow_ema_period != fast_ema_period:

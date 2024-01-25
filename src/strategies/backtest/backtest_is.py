@@ -31,10 +31,10 @@ insample_list = kucoin_data.get_insample_list(tradingview_data_file_set_is, path
 
 print("data is loaded")
 # defining ema combination that will be backtested
-fast_ema = [*range(60, 72, 6)]
-slow_ema = [*range(180,192, 6)]
-hardstop_list = np.arange(2, 2.5, 0.5)
-special_exit_opt_list = np.arange(5, 7, 1)
+fast_ema = [*range(66, 79, 6)]
+slow_ema = [*range(254, 291, 6)]
+hardstop_list = np.arange(99, 100, 1)
+special_exit_opt_list = np.arange(5, 6, 1)
 
 ema_combinations = list(itertools.product(fast_ema, slow_ema, hardstop_list, special_exit_opt_list))
 print("list of ema combinations to be tested: {ema_combinations}".format( ema_combinations=ema_combinations ))
@@ -81,7 +81,7 @@ for ema_combination in ema_combinations:
 
         #running backtesting binance
         
-        filter_data = data[ (data.index > "2018-01-01") & (data.index < "2022-02-01")]
+        filter_data = data[ (data.index > "2020-06-01") & (data.index < "2022-06-01")]
         #check that file contain data and enought row to calculate ema
         if not filter_data.empty and len(filter_data) > ema_combination[0] and len(filter_data) > ema_combination[1] and len(filter_data) > sources.atr_length and ema_combination[0] < ema_combination[1]:
             bt = Backtest(filter_data, strategy.ema_cross_w_atr_strategy, cash=sources.cash,  commission=sources.commission)
